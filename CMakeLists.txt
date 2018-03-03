@@ -16,7 +16,7 @@ add_subdirectory(./googletest/googletest)
 
 include_directories(googletest/googletest/include googletest/googletest)
 
-add_executable(mlmm_cpp main.cpp
+add_executable(mlmm main.cpp
         googletest
         googletest/googletest
         src/InputParser.cpp
@@ -55,4 +55,4 @@ add_executable(mlmm_cpp main.cpp
         src/service/emmax_service.cpp src/service/emmax_service.h src/impl/phenotype_impl.cpp src/impl/phenotype_impl.h src/tests/impl/phenotype_impl.test.cpp src/tests/service/emmax_service_test.cpp src/tests/impl/emmax_impl_test.cpp src/tests/impl/my_math_impl_test.cpp src/model/Emma_result.cpp src/model/Emma_result.h src/service/service.h)
 
 
-target_link_libraries( mlmm_cpp gtest gtest_main )
+target_link_libraries( mlmm gtest gtest_main )
