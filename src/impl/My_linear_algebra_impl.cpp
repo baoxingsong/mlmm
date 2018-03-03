@@ -177,30 +177,30 @@ Qr_decomposition_result qr_decomposition( const My_matrix<double> & _a){
     Qr_decomposition_result qr_decomposition_result(a, q);
     return qr_decomposition_result;
 }
-
-//eigen value from large to small
-// every line is a eigen vector
-Eigen_result eigen_2( const My_matrix<double> & _a){
-    assert(_a.get_num_row() == _a.get_num_column());
-    Eigen::MatrixXd A(_a.get_num_column(), _a.get_num_row());
-    int i, j;
-    for( i=0; i <_a.get_num_column(); ++i ){
-        for( j=0; j <_a.get_num_column(); ++j ) {
-            A(i,j)=_a.get_matrix()[i][j];
-        }
-    }
-    Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> es(A);
-    My_Vector<double> eigen_values(_a.get_num_column());
-    My_matrix<double> v_o(_a.get_num_column(), _a.get_num_column());
-    for( i=0; i <_a.get_num_column(); ++i ){
-        eigen_values.get_array()[i] = es.eigenvalues()(i);
-        for( j=0; j <_a.get_num_column(); ++j ) {
-            v_o.get_matrix()[i][j]=es.eigenvectors().col(i)[j];
-        }
-    }
-    Eigen_result eigen_result(eigen_values, v_o);
-    return eigen_result;
-}
+//
+////eigen value from large to small
+//// every line is a eigen vector
+//Eigen_result eigen_2( const My_matrix<double> & _a){
+//    assert(_a.get_num_row() == _a.get_num_column());
+//    Eigen::MatrixXd A(_a.get_num_column(), _a.get_num_row());
+//    int i, j;
+//    for( i=0; i <_a.get_num_column(); ++i ){
+//        for( j=0; j <_a.get_num_column(); ++j ) {
+//            A(i,j)=_a.get_matrix()[i][j];
+//        }
+//    }
+//    Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> es(A);
+//    My_Vector<double> eigen_values(_a.get_num_column());
+//    My_matrix<double> v_o(_a.get_num_column(), _a.get_num_column());
+//    for( i=0; i <_a.get_num_column(); ++i ){
+//        eigen_values.get_array()[i] = es.eigenvalues()(i);
+//        for( j=0; j <_a.get_num_column(); ++j ) {
+//            v_o.get_matrix()[i][j]=es.eigenvectors().col(i)[j];
+//        }
+//    }
+//    Eigen_result eigen_result(eigen_values, v_o);
+//    return eigen_result;
+//}
 
 
 

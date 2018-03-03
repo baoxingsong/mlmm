@@ -14,7 +14,6 @@
 #include <set>
 #include <map>
 #include "Qr_decomposition_result.h"
-#include "../eigen/Eigen/Eigenvalues"
 const int missing_genotype = 0;
 
 #endif //MLMM_CPP_MODEL_H
