@@ -10,6 +10,11 @@ if (APPLE)
 endif (APPLE)
 
 
+if (CMAKE_BUILD_TYPE EQUAL "DEBUG")
+    message("debug mode")
+endif (CMAKE_BUILD_TYPE EQUAL "DEBUG")
+
+
 #for google test begin
 add_subdirectory(./googletest/googletest)
 

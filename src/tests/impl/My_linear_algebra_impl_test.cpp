@@ -217,8 +217,9 @@ TEST (eigen, c1){
     Eigen_result r1 = eigen(a);
     Eigen_result r2 = eigen(c);
     std::cout << std::endl;
-    for( int i=0; i<5; ++i ){
-        for( int j=0; j<5; ++j ){
+    int i, j;
+    for( i=0; i<5; ++i ){
+        for( j=0; j<5; ++j ){
             printf("%12.25f ", r1.get_eigen_vectors().get_matrix()[i][j]);
             printf("%12.25f ", r2.get_eigen_vectors().get_matrix()[i][j]);
             std::cout << std::endl;
@@ -227,32 +228,36 @@ TEST (eigen, c1){
         std::cout << std::endl;
     }
     std::cout << std::endl;
-    for( int i=0; i<5; ++i ){
+    for( i=0; i<5; ++i ){
         printf("%12.25f\n", r1.get_eigen_values().get_array()[i]);
         ASSERT_TRUE(abs(r1.get_eigen_values().get_array()[i] -r2.get_eigen_values().get_array()[i]+1) < 0.0000000001 );
     }
 
     std::cout << std::endl;
-//
-//    ASSERT_TRUE(abs(r1.get_eigen_vectors().get_matrix()[3][0] - 0.654083) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_vectors().get_matrix()[3][1] - 0.199681) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_vectors().get_matrix()[3][2] - 0.256510) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_vectors().get_matrix()[3][3] - -0.660403) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_vectors().get_matrix()[3][4] - -0.174280) < 0.00001 );
-//
-//    ASSERT_TRUE(abs(r1.get_eigen_vectors().get_matrix()[0][0] - -0.174505) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_vectors().get_matrix()[1][0] - -0.623702) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_vectors().get_matrix()[2][0] - 0.0521511) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_vectors().get_matrix()[3][0] - 0.654083) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_vectors().get_matrix()[4][0] - -0.387297) < 0.00001 );
-//
-//    ASSERT_TRUE(abs(r1.get_eigen_values().get_array()[0] - 19.17542) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_values().get_array()[1] - 15.80892) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_values().get_array()[2] - 9.365555) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_values().get_array()[3] - 6.994837) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_values().get_array()[4] - 1.655266) < 0.00001 );
 
-    ASSERT_EQ(0, 0);
+    My_matrix<double> this_eig_values(5, 5);
+    for( i=0; i<5; ++i ){
+        for( j=0; j<5; ++j ){
+            this_eig_values.get_matrix()[i][j]=0;
+        }
+        this_eig_values.get_matrix()[i][i]=r1.get_eigen_values().get_array()[i];
+    }
+    My_matrix<double> this_eig_vectors(5, 5);
+    for( i=0; i<5; ++i ){
+        for( j=0; j<5; ++j ){
+            this_eig_vectors.get_matrix()[i][j] = r1.get_eigen_vectors().get_matrix()[j][i];
+        }
+    }
+
+    My_matrix<double> t1(5, 5);
+    trmul(this_eig_vectors, this_eig_values, t1);
+    My_matrix<double> t2(5, 5);
+    trmul(t1, r1.get_eigen_vectors(), t2);
+    for( i=0; i<5; ++i ) {
+        for (j = 0; j < 5; ++j) {
+            ASSERT_TRUE(abs(t2.get_matrix()[i][j] - a.get_matrix()[i][j]) < 0.0000000001 );
+        }
+    }
 }
 
 TEST (eigen, cqr){
@@ -271,8 +276,9 @@ TEST (eigen, cqr){
     Eigen_result r1 = eigen(a, eps, 1000000, a.get_num_column());
     Eigen_result r2 = eigen(c, eps, 1000000, c.get_num_column());
     std::cout << std::endl;
-    for( int i=0; i<5; ++i ){
-        for( int j=0; j<5; ++j ){
+    int i, j;
+    for( i=0; i<5; ++i ){
+        for( j=0; j<5; ++j ){
             printf("%12.25f ", r1.get_eigen_vectors().get_matrix()[i][j]);
             printf("%12.25f ", r2.get_eigen_vectors().get_matrix()[i][j]);
             std::cout << std::endl;
@@ -281,31 +287,35 @@ TEST (eigen, cqr){
         std::cout << std::endl;
     }
     std::cout << std::endl;
-    for( int i=0; i<5; ++i ){
+    for( i=0; i<5; ++i ){
         printf("%12.25f\n", r1.get_eigen_values().get_array()[i]);
         ASSERT_TRUE(abs(r1.get_eigen_values().get_array()[i] -r2.get_eigen_values().get_array()[i]+1) < 0.0000000001 );
     }
 
     std::cout << std::endl;
-//
-//    ASSERT_TRUE(abs(r1.get_eigen_vectors().get_matrix()[3][0] - 0.654083) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_vectors().get_matrix()[3][1] - 0.199681) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_vectors().get_matrix()[3][2] - 0.256510) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_vectors().get_matrix()[3][3] - -0.660403) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_vectors().get_matrix()[3][4] - -0.174280) < 0.00001 );
-//
-//    ASSERT_TRUE(abs(r1.get_eigen_vectors().get_matrix()[0][0] - 0.174505) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_vectors().get_matrix()[1][0] - -0.623702) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_vectors().get_matrix()[2][0] - 0.0521511) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_vectors().get_matrix()[3][0] - 0.654083) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_vectors().get_matrix()[4][0] - 0.387297) < 0.00001 );
-//
-//    ASSERT_TRUE(abs(r1.get_eigen_values().get_array()[0] - 19.17542) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_values().get_array()[1] - 15.80892) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_values().get_array()[2] - 9.365555) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_values().get_array()[3] - 6.994837) < 0.00001 );
-//    ASSERT_TRUE(abs(r1.get_eigen_values().get_array()[4] - 1.655266) < 0.00001 );
-    ASSERT_EQ(0, 0);
+    My_matrix<double> this_eig_values(5, 5);
+    for( i=0; i<5; ++i ){
+        for( j=0; j<5; ++j ){
+            this_eig_values.get_matrix()[i][j]=0;
+        }
+        this_eig_values.get_matrix()[i][i]=r1.get_eigen_values().get_array()[i];
+    }
+    My_matrix<double> this_eig_vectors(5, 5);
+    for( i=0; i<5; ++i ){
+        for( j=0; j<5; ++j ){
+            this_eig_vectors.get_matrix()[i][j] = r1.get_eigen_vectors().get_matrix()[j][i];
+        }
+    }
+
+    My_matrix<double> t1(5, 5);
+    trmul(this_eig_vectors, this_eig_values, t1);
+    My_matrix<double> t2(5, 5);
+    trmul(t1, r1.get_eigen_vectors(), t2);
+    for( i=0; i<5; ++i ) {
+        for (j = 0; j < 5; ++j) {
+            ASSERT_TRUE(abs(t2.get_matrix()[i][j] - a.get_matrix()[i][j]) < 0.0000000001 );
+        }
+    }
 }
 
 TEST(T_matrix, c1){
