@@ -5,7 +5,6 @@
 #ifndef MLMM_CPP_INDIVIDUAL_H
 #define MLMM_CPP_INDIVIDUAL_H
 #include <string>
-#include <iostream>
 
 class Individual {
     private:

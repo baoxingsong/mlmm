@@ -6,7 +6,6 @@
 #define MLMM_CPP_Variant_H
 
 #include <string>
-#include <iostream>
 
 class Variant {
     private:

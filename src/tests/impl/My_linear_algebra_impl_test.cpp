@@ -8,7 +8,6 @@
 
 #include "../../model/model.h"
 #include "../../impl/impl.h"
-#include <cmath>
 #include "../../../googletest/googletest/include/gtest/gtest.h"
 
 int add (int a, int b){
@@ -189,14 +188,14 @@ TEST (qr_decomposition, c1){
     }
     std::cout << std::endl;
 
-    ASSERT_TRUE(abs(qr_decomposition_result.get_q().get_matrix()[0][0] - -0.377964) < 0.00001 );
-    ASSERT_TRUE(abs(qr_decomposition_result.get_q().get_matrix()[1][1] - -0.377964) < 0.00001 );
-    ASSERT_TRUE(abs(qr_decomposition_result.get_q().get_matrix()[2][2] - -0.377964) < 0.00001 );
-    ASSERT_TRUE(abs(qr_decomposition_result.get_q().get_matrix()[3][0] - 0.377964) < 0.00001 );
+    ASSERT_TRUE(fabs(qr_decomposition_result.get_q().get_matrix()[0][0] - -0.377964) < 0.00001 );
+    ASSERT_TRUE(fabs(qr_decomposition_result.get_q().get_matrix()[1][1] - -0.377964) < 0.00001 );
+    ASSERT_TRUE(fabs(qr_decomposition_result.get_q().get_matrix()[2][2] - -0.377964) < 0.00001 );
+    ASSERT_TRUE(fabs(qr_decomposition_result.get_q().get_matrix()[3][0] - 0.377964) < 0.00001 );
 
-    ASSERT_TRUE(abs(qr_decomposition_result.get_r().get_matrix()[0][0] - -2.64575) < 0.00001 );
-    ASSERT_TRUE(abs(qr_decomposition_result.get_r().get_matrix()[1][1] - -2.64575) < 0.00001 );
-    ASSERT_TRUE(abs(qr_decomposition_result.get_r().get_matrix()[2][2] - -1.13389) < 0.00001 );
+    ASSERT_TRUE(fabs(qr_decomposition_result.get_r().get_matrix()[0][0] - -2.64575) < 0.00001 );
+    ASSERT_TRUE(fabs(qr_decomposition_result.get_r().get_matrix()[1][1] - -2.64575) < 0.00001 );
+    ASSERT_TRUE(fabs(qr_decomposition_result.get_r().get_matrix()[2][2] - -1.13389) < 0.00001 );
 
     ASSERT_EQ(0, 0);
 }
@@ -223,14 +222,14 @@ TEST (eigen, c1){
             printf("%12.25f ", r1.get_eigen_vectors().get_matrix()[i][j]);
             printf("%12.25f ", r2.get_eigen_vectors().get_matrix()[i][j]);
             std::cout << std::endl;
-            ASSERT_TRUE(abs(r1.get_eigen_vectors().get_matrix()[i][j]-r2.get_eigen_vectors().get_matrix()[i][j]) < 0.0000000001);
+            ASSERT_TRUE(fabs(r1.get_eigen_vectors().get_matrix()[i][j]-r2.get_eigen_vectors().get_matrix()[i][j]) < 0.0000000001);
         }
         std::cout << std::endl;
     }
     std::cout << std::endl;
     for( i=0; i<5; ++i ){
         printf("%12.25f\n", r1.get_eigen_values().get_array()[i]);
-        ASSERT_TRUE(abs(r1.get_eigen_values().get_array()[i] -r2.get_eigen_values().get_array()[i]+1) < 0.0000000001 );
+        ASSERT_TRUE(fabs(r1.get_eigen_values().get_array()[i] -r2.get_eigen_values().get_array()[i]+1) < 0.0000000001 );
     }
 
     std::cout << std::endl;
@@ -255,7 +254,7 @@ TEST (eigen, c1){
     trmul(t1, r1.get_eigen_vectors(), t2);
     for( i=0; i<5; ++i ) {
         for (j = 0; j < 5; ++j) {
-            ASSERT_TRUE(abs(t2.get_matrix()[i][j] - a.get_matrix()[i][j]) < 0.0000000001 );
+            ASSERT_TRUE(fabs(t2.get_matrix()[i][j] - a.get_matrix()[i][j]) < 0.0000000001 );
         }
     }
 }
@@ -282,14 +281,14 @@ TEST (eigen, cqr){
             printf("%12.25f ", r1.get_eigen_vectors().get_matrix()[i][j]);
             printf("%12.25f ", r2.get_eigen_vectors().get_matrix()[i][j]);
             std::cout << std::endl;
-            ASSERT_TRUE(abs(r1.get_eigen_vectors().get_matrix()[i][j]-r2.get_eigen_vectors().get_matrix()[i][j]) < 0.0000000001);
+            ASSERT_TRUE(fabs(r1.get_eigen_vectors().get_matrix()[i][j]-r2.get_eigen_vectors().get_matrix()[i][j]) < 0.0000000001);
         }
         std::cout << std::endl;
     }
     std::cout << std::endl;
     for( i=0; i<5; ++i ){
         printf("%12.25f\n", r1.get_eigen_values().get_array()[i]);
-        ASSERT_TRUE(abs(r1.get_eigen_values().get_array()[i] -r2.get_eigen_values().get_array()[i]+1) < 0.0000000001 );
+        ASSERT_TRUE(fabs(r1.get_eigen_values().get_array()[i] -r2.get_eigen_values().get_array()[i]+1) < 0.0000000001 );
     }
 
     std::cout << std::endl;
@@ -313,7 +312,7 @@ TEST (eigen, cqr){
     trmul(t1, r1.get_eigen_vectors(), t2);
     for( i=0; i<5; ++i ) {
         for (j = 0; j < 5; ++j) {
-            ASSERT_TRUE(abs(t2.get_matrix()[i][j] - a.get_matrix()[i][j]) < 0.0000000001 );
+            ASSERT_TRUE(fabs(t2.get_matrix()[i][j] - a.get_matrix()[i][j]) < 0.0000000001 );
         }
     }
 }

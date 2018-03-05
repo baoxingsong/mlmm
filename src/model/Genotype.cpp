@@ -3,6 +3,8 @@
 //
 
 #include "Genotype.h"
+
+
 Genotype::Genotype(){
     this->number_of_individual = 0;
     this->number_of_variant = 0;

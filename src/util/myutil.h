@@ -25,16 +25,11 @@
 #ifndef _MYUTIL_H
 #define _MYUTIL_H
 #include <string>
-#include <iostream>
-#include <sstream>
 #include <cassert>
 #include <vector>
 #include "../model/My_Vector.h"
 
 #include <sys/time.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 
 void split(const std::string &s, std::vector<std::string> &elements);
 //std::vector<std::string> split(const std::string &s, char delim);

@@ -153,7 +153,7 @@ double incomBeta(double x, double a, double b) {
     if (a <= 0.0 || b <= 0.0) {
         return 0.0;
     }
-    if (abs(x - 0.0) < 1.0e-30 || abs(x - 1.0) < 1.0e-30) {
+    if (fabs(x - 0.0) < 1.0e-30 || fabs(x - 1.0) < 1.0e-30) {
         return 0.0;
     }
 
@@ -167,20 +167,20 @@ double incomBeta(double x, double a, double b) {
         while (1) {
             f1 = fi(2 * n, x, a, b);
             f2 = fi(2 * n + 2, x, a, b);
-            if (abs(f2 - f1) < 1.0e-30)
+            if (fabs(f2 - f1) < 1.0e-30)
                 return f2 * c1 * c2 / a / c3;
             else
                 n++;
         }
     } else {
-        if (abs(x - 0.5) < 1.0e-30 && abs(a - b) < 1.0e-30)
+        if (fabs(x - 0.5) < 1.0e-30 && fabs(a - b) < 1.0e-30)
             return 0.5;
         else {
             n = 1;
             while (1) {
                 f1 = fi(2 * n, 1.0 - x, b, a);
                 f2 = fi(2 * n + 2, 1.0 - x, b, a);
-                if (abs(f2 - f1) < 1.0e-30)
+                if (fabs(f2 - f1) < 1.0e-30)
                     return 1.0 - f2 * c1 * c2 / b / c3;
                 else
                     n++;

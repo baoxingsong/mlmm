@@ -85,9 +85,9 @@ TEST(get_eigen_R_test_function, c1){
     for( int i=0; i< e_r.get_eigen_vectors().get_num_column(); ++i ) {
         printf("%10.20f\n", e_r.get_eigen_vectors().get_matrix()[1][i]);
     }
-    ASSERT_TRUE(abs(e_r.get_eigen_values().get_array()[0] - 5.0497597) < 0.00001 );
-    ASSERT_TRUE(abs(e_r.get_eigen_values().get_array()[1] - 3.68871906) < 0.00001 );
-    //ASSERT_TRUE(abs(e_r.get_eigen_vectors().get_matrix()[1][1] - -0.116992663) < 0.00001 );
+    ASSERT_TRUE(fabs(e_r.get_eigen_values().get_array()[0] - 5.0497597) < 0.00001 );
+    ASSERT_TRUE(fabs(e_r.get_eigen_values().get_array()[1] - 3.68871906) < 0.00001 );
+    //ASSERT_TRUE(fabs(e_r.get_eigen_vectors().get_matrix()[1][1] - -0.116992663) < 0.00001 );
     ASSERT_EQ(0, 0);
 }
 

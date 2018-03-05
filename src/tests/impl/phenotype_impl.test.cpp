@@ -5,7 +5,6 @@
 #include "../../impl/phenotype_impl.h"
 #include "../../model/model.h"
 #include "../../impl/impl.h"
-#include <cmath>
 #include "../../../googletest/googletest/include/gtest/gtest.h"
 
 

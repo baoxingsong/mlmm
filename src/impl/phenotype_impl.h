@@ -8,7 +8,6 @@
 #include "../model/model.h"
 #include <vector>
 #include <fstream>
-#include <iostream>
 #include <cstdlib>
 #include <cstdio>
 class phenotype_impl {

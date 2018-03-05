@@ -8,7 +8,6 @@
 #include "../util/util.h"
 #include "../model/model.h"
 #include "My_linear_algebra_impl.h"
-
 Eigen_result _get_eigen_L_(const My_matrix<double> & k);
 
 Eigen_result _get_eigen_R_(const My_matrix<double> & x, const My_matrix<double> & k);

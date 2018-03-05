@@ -6,12 +6,11 @@
 #define MLMM_CPP_GENOTYPE_H
 
 #include <string>
-#include <iostream>
 #include <vector>
 #include "Variant.h"
 #include "Individual.h"
 #include "My_matrix.h"
-
+#include <iostream>
 class Genotype {
     private:
         My_matrix<unsigned int > genotype_matrix;

@@ -8,7 +8,6 @@
 #include "../model/model.h"
 #include "My_linear_algebra_impl.h"
 #include <fstream>
-#include <iostream>
 
 
 class Kinship_matrix_impl {

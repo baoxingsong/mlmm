@@ -5,8 +5,7 @@
 #ifndef MLMM_CPP_MY_MATRIX_H
 #define MLMM_CPP_MY_MATRIX_H
 #include <sstream>
-#include <iostream>
-
+#include <cstring>
 template <typename T>
 
 class My_matrix {

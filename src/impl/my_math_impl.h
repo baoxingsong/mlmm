@@ -4,8 +4,7 @@
 
 #ifndef MLMM_CPP_MY_MATH_IMPL_H
 #define MLMM_CPP_MY_MATH_IMPL_H
-#include <iostream>
-#include <cmath>
+#include "../model/model.h"
 double my_gamma( const double & x );
 //double beta( const double & a, const double & b, const double & x );
 double sf( double f, int n1, int n2);

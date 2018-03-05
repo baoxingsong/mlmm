@@ -403,7 +403,7 @@ Emma_result get_estimates ( const My_Vector<double> & y, const My_matrix<double>
     double opt_delta;
     double opt_ll;
     if (zero_intervals.size() > 0){
-        opt_ll = -MAXFLOAT;
+        opt_ll = -DBL_MAX;
         int opt_i;
         for(std::map<int, double>::iterator it=zero_intervals.begin();it!=zero_intervals.end();++it){
             if( it->second > opt_ll ){

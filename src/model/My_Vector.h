@@ -7,9 +7,9 @@
 
 #include <sstream>
 #include <vector>
+#include <cstring>
 
 template <typename T>
-
 class My_Vector {
     private:
         T * array;
