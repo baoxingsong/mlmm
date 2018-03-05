@@ -8,6 +8,6 @@
 #include "./service/service.h"
 #include "./InputParser.h"
 
-int control(int argc, char ** argv);
+int control(int argc, char** argv);
 
 #endif //MLMM_CPP_CONTROL_H
