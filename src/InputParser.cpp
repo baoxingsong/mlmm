@@ -64,6 +64,7 @@ void usage( ) {
               "   -p        phenotype file" << std::endl <<
               "   -g        genotype file" << std::endl <<
               "   -f        genotype file format ped/tped" << std::endl<<
+              "   -m        minor allele frequency for filtering" << std::endl<<
               "   -k        kinship matrix file" << std::endl;
 
 }
