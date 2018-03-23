@@ -17,7 +17,9 @@ class Eigen_result {
         Eigen_result( const My_Vector<double> & _eigen_values, const My_matrix<double> & _eigen_vectors);
         const My_Vector<double> &get_eigen_values() const;
         const My_matrix<double> &get_eigen_vectors() const;
-
+        Eigen_result();
+        void set_eigen_values(const My_Vector<double> & _eigen_values);
+        void set_eigen_vectors(const My_matrix<double> & _eigen_vectors);
 };
 
 #endif //MLMM_CPP_EIGEN_RESULT_H

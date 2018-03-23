@@ -355,9 +355,47 @@ TEST(lsq, c1){
     for( int i=0; i<b.get_length(); ++i ){
         printf("%10.20f\n", b.get_array()[i]);
     }
-    ASSERT_EQ(-1.19047619047619068766, b.get_array()[0]);
-    ASSERT_EQ(0.95238095238095243911, b.get_array()[1]);
-    ASSERT_EQ(-0.66666666666666696273, b.get_array()[2]);
+    ASSERT_TRUE(fabs(-1.19047619047619068766 - b.get_array()[0]) < 0.0000000001 );
+    ASSERT_TRUE(fabs(0.95238095238095243911 - b.get_array()[1]) < 0.0000000001 );
+    ASSERT_TRUE(fabs(-0.66666666666666696273 - b.get_array()[2]) < 0.0000000001 );
+
+    My_matrix<double> x1 (4, 2);
+    x1.get_matrix()[0][0]=1.0;
+    x1.get_matrix()[1][0]=1.0;
+    x1.get_matrix()[2][0]=1.0;
+    x1.get_matrix()[3][0]=1.0;
+
+    x1.get_matrix()[0][1]=1.0;
+    x1.get_matrix()[1][1]=2.0;
+    x1.get_matrix()[2][1]=2.0;
+    x1.get_matrix()[3][1]=1.0;
+    My_Vector<double> b1(x1.get_num_column());
+    lsq(x1, y, b1);
+
+    My_matrix<double> x2 (4, 2);
+    x2.get_matrix()[0][0]=1.0;
+    x2.get_matrix()[1][0]=1.0;
+    x2.get_matrix()[2][0]=1.0;
+    x2.get_matrix()[3][0]=1.0;
+
+    x2.get_matrix()[0][1]=1.0;
+    x2.get_matrix()[1][1]=0.0;
+    x2.get_matrix()[2][1]=0.0;
+    x2.get_matrix()[3][1]=1.0;
+
+    My_Vector<double> b2(x2.get_num_column());
+    lsq(x2, y, b2);
+
+    for( int i=0; i<x1.get_num_row(); ++i ){
+        printf("intercept: %10.50f\t%10.50f\n", b1.get_array()[0], b2.get_array()[0]);
+        printf("slop: %10.50f\t%10.50f\n", b1.get_array()[1], b2.get_array()[1]);
+        printf("%10.50f\t%10.50f\n", b1.get_array()[0]+b1.get_array()[1]*x1.get_matrix()[i][1], b2.get_array()[0]+b2.get_array()[1]*x2.get_matrix()[i][1]);
+    }
+    // TODO there is no approximation, why they are not identical with each other
+    ASSERT_EQ(b1.get_array()[0]+b1.get_array()[1]*x1.get_matrix()[0][1], b2.get_array()[0]+b2.get_array()[1]*x2.get_matrix()[0][1]);
+    ASSERT_EQ(b1.get_array()[0]+b1.get_array()[1]*x1.get_matrix()[1][1], b2.get_array()[0]+b2.get_array()[1]*x2.get_matrix()[1][1]);
+    ASSERT_EQ(b1.get_array()[0]+b1.get_array()[1]*x1.get_matrix()[2][1], b2.get_array()[0]+b2.get_array()[1]*x2.get_matrix()[2][1]);
+    ASSERT_EQ(b1.get_array()[0]+b1.get_array()[1]*x1.get_matrix()[3][1], b2.get_array()[0]+b2.get_array()[1]*x2.get_matrix()[3][1]);
 }
 
 TEST(strq, c1){

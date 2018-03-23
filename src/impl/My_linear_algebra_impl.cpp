@@ -315,12 +315,35 @@ Qr_decomposition_result qr_decomposition( const My_matrix<double> & _a){
 // for a equation y=bx
 //y is a vector with size n   x is a two dimension matrix with size n*m
 // b is a vector with size m, when return it is the beta values of the function
-void lsq(  const My_matrix<double> & x, const  My_Vector<double> & y, My_Vector<double> & b ){
 
-    unsigned long n= y.get_length();
+void lsq(  const My_matrix<double> & x, const  My_Vector<double> & y, My_Vector<double> & b ){
+    unsigned long n = y.get_length();
     unsigned long m = x.get_num_column();
-    assert(b.get_length() == m);
-    assert(y.get_length() == x.get_num_row());
+    My_matrix<double> x_t(m, n);
+    T_matrix(x, x_t);
+    My_matrix<double> xt_x(m, m);
+    trmul<double>(x_t, x, xt_x);
+    inverse_matrix(xt_x);
+    My_matrix<double> xt_x_inverse_xt(m, n);
+    trmul<double>(xt_x, x_t, xt_x_inverse_xt);
+    int i, j;
+    for( i=0; i<m; ++i ){
+        b.get_array()[i]=0;
+        for( j=0; j<n; ++j ){
+            b.get_array()[i] += xt_x_inverse_xt.get_matrix()[i][j]*y.get_array()[j];
+        }
+    }
+}
+
+
+
+// the result of lq2 is different with R, maybe there is something wrong
+void lsq2(  const My_matrix<double> & x, const  My_Vector<double> & y, My_Vector<double> & b ){
+
+    unsigned long n = y.get_length();
+    unsigned long m = x.get_num_column();
+//    assert(b.get_length() == m);
+//    assert(y.get_length() == x.get_num_row());
 
     double * y_t = new double[y.get_length()];
     memcpy(y_t, y.get_array(), n * sizeof(double));
@@ -354,7 +377,6 @@ void lsq(  const My_matrix<double> & x, const  My_Vector<double> & y, My_Vector<
     delete [] y_t;
 
 }
-
 
 void strq(const My_matrix<double> & a, double ** q, double *b, double * c) {
     int n = a.get_num_column();

@@ -17,6 +17,18 @@ const My_matrix<double> &Eigen_result::get_eigen_vectors() const {
     return eigen_vectors;
 }
 
+Eigen_result::Eigen_result(){
+
+}
+
+void Eigen_result::set_eigen_values(const My_Vector<double> & _eigen_values){
+    this->eigen_values=_eigen_values;
+}
+
+void Eigen_result::set_eigen_vectors(const My_matrix<double> & _eigen_vectors){
+    this->eigen_vectors=_eigen_vectors;
+}
+
 //void Eigen_result::first_several(const unsigned long & size){
 //    this->eigen_values.set_length(size);
 //    this->eigen_vectors.set_num_row(size);

@@ -590,3 +590,137 @@ void emmax_test_multi_allic_multi_test_full_model( const std::string & phenotype
     double man_u = (double)pi.getIndividual_ids().size() - man_l;
     emmax_test_multi_allic_multi_test_full_model ( pi, k_i, genotype,man_l, man_u );
 }
+
+
+
+// if I could develop a model that take fixed model as a special case of mixed model
+// then we could use multi allic variants as random variables and get the p-values
+void emmax_test_multi_allic_single_random_test(phenotype_impl & pi, Kinship_matrix_impl & k_i, Genotype & genotype, const double & man_l, const double & man_u ){
+
+    int i, j, j_1;
+    Emma_result e_er = estimate( pi, k_i, genotype );
+    int covariantsNumber = 1;
+    int n = genotype.get_number_of_individual();
+
+    // claim those variables firstly could save RAM operation and save computational time begin
+
+    double mahalanobis_rss, f_stat, p_val;
+    double h0_rss = e_er.getMahalanobis_rss();
+
+
+    My_Vector<double> x_beta(n);
+    // claim those variables firstly could save RAM operation and save computational time end
+
+    printf("Chr\tposition\tid\tp_val\n");
+    int this_this_state, q, p, size, freedome1;
+    for( j=0; j<genotype.get_number_of_variant(); ++j ) {
+        if (genotype.get_variant_Vector()[j].getId()[genotype.get_variant_Vector()[j].getId().size() - 1] == 'b') {
+
+        } else {
+            std::map<int, int> allThisStates;
+            for (i = 0; i < n; ++i) {
+                if( allThisStates.find(genotype.get_genotype_matrix().get_matrix()[i][j]) == allThisStates.end() ){
+                    allThisStates[genotype.get_genotype_matrix().get_matrix()[i][j]] = 1;
+                }else{
+                    allThisStates[genotype.get_genotype_matrix().get_matrix()[i][j]] = allThisStates[genotype.get_genotype_matrix().get_matrix()[i][j]] + 1;
+                }
+            }
+
+            std::vector<int> allThisStates_vector;
+            for (std::map<int, int>::iterator ittt = allThisStates.begin(); ittt != allThisStates.end(); ++ittt) {
+                if( ittt->second >= man_l && ittt->second <= man_u && ittt->second!=missing_genotype){
+                    allThisStates_vector.push_back(ittt->first);
+                }
+            }
+            if( allThisStates_vector.size() > 1 ){
+
+                size = allThisStates_vector.size();
+                q = covariantsNumber + size - 1;
+                p = n - q;
+
+                My_matrix<double> full_x(n, q);
+                My_matrix<double> X_t(n, q);
+                for (i = 0; i < n; ++i) {
+                    full_x.get_matrix()[i][0] = 1;
+                }
+                for (i = 0; i < n; ++i) {
+                    for (j_1 = 0; j_1 < (size - 1); ++j_1) { // left one allele
+                        if (allThisStates_vector[j_1] == genotype.get_genotype_matrix().get_matrix()[i][j]) {
+                            this_this_state = 1;
+                        } else {
+                            this_this_state = 0;
+                        }
+                        full_x.get_matrix()[i][j_1 + 1] = this_this_state;
+                    }
+                }
+                My_Vector<double> beta_est(q);
+                trmul(e_er.getH_sqrt_inv(), full_x, X_t);
+                lsq(X_t, e_er.getY_t(), beta_est);
+
+                for (i = 0; i < n; ++i) {
+                    x_beta.get_array()[i] = 0;
+                    for (j_1 = 0; j_1 < q; ++j_1) {
+                        x_beta.get_array()[i] += X_t.get_matrix()[i][j_1] * beta_est.get_array()[j_1];
+                    }
+                }
+                mahalanobis_rss = 0.0;
+                for (i = 0; i < n; ++i) {
+                    mahalanobis_rss += pow(e_er.getY_t().get_array()[i] - x_beta.get_array()[i], 2);
+                }
+                freedome1 = q - covariantsNumber;
+                f_stat = (h0_rss / mahalanobis_rss - 1) * p / (freedome1);
+                p_val = sf(f_stat, freedome1, p);
+                std::cout << genotype.get_variant_Vector()[j].getChromosome() << "\t"
+                          << genotype.get_variant_Vector()[j].getPosition() << "\t"
+                          << genotype.get_variant_Vector()[j].getId();
+                if (p_val == 0.0) {
+                    p_val = 0.00000000000000000001;
+                }
+                printf("\t%10.20f\n", p_val);
+                //printf("%s\t%d\t%s\t%10.20f\n", genotype.get_variant_Vector()[j].getChromosome(), genotype.get_variant_Vector()[j].getPosition(), genotype.get_variant_Vector()[j].getId(),  p_val);
+            }else if ( allThisStates_vector.size() == 1 && allThisStates_vector[0]!=missing_genotype ){
+                size = 1;
+                q = covariantsNumber+ size;
+                p = n - q;
+
+                My_matrix<double> full_x(n, q);
+                My_matrix<double> X_t(n, q);
+                for (i = 0; i < n; ++i) {
+                    full_x.get_matrix()[i][0] = 1;
+                }
+                for (i = 0; i < n; ++i) { // here we take missing value as a state
+                    if (allThisStates_vector[0] == genotype.get_genotype_matrix().get_matrix()[i][j]) {
+                        this_this_state = 1;
+                    } else {
+                        this_this_state = 0;
+                    }
+                    full_x.get_matrix()[i][1] = this_this_state;
+                }
+                My_Vector<double> beta_est(q);
+                trmul(e_er.getH_sqrt_inv(), full_x, X_t);
+                lsq(X_t, e_er.getY_t(), beta_est);
+
+                for (i = 0; i < n; ++i) {
+                    x_beta.get_array()[i] = 0;
+                    for (j_1 = 0; j_1 < q; ++j_1) {
+                        x_beta.get_array()[i] += X_t.get_matrix()[i][j_1] * beta_est.get_array()[j_1];
+                    }
+                }
+                mahalanobis_rss = 0.0;
+                for (i = 0; i < n; ++i) {
+                    mahalanobis_rss += pow(e_er.getY_t().get_array()[i] - x_beta.get_array()[i], 2);
+                }
+                freedome1 = 1;
+                f_stat = (h0_rss / mahalanobis_rss - 1) * p / (freedome1);
+                p_val = sf(f_stat, freedome1, p);
+                std::cout << genotype.get_variant_Vector()[j].getChromosome() << "\t"
+                          << genotype.get_variant_Vector()[j].getPosition() << "\t"
+                          << genotype.get_variant_Vector()[j].getId();
+                if (p_val == 0.0) {
+                    p_val = 0.00000000000000000001;
+                }
+                printf("\t%10.20f\n", p_val);
+            }
+        }
+    }
+}
