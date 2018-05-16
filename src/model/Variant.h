@@ -14,6 +14,7 @@ class Variant {
         float genetic_distance;
         unsigned long position;
     public:
+        Variant();
         Variant(const std::string& _chromosome, const std::string& _id,
                 const float & _geneticDistance, const unsigned long & _position);
 
@@ -30,5 +31,4 @@ class Variant {
         void setPosition(unsigned long position);
 
 };
-
 #endif //MLMM_CPP_Variant_H

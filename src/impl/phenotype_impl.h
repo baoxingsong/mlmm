@@ -16,6 +16,7 @@ class phenotype_impl {
         std::vector <std::string> family_ids;
         My_Vector <double> phenotypes;
     public:
+        phenotype_impl();
         phenotype_impl(const std::string & file_path, const std::string & format);
         const std::vector<std::string> &getIndividual_ids() const;
         void setIndividual_ids(const std::vector<std::string> &individual_ids);

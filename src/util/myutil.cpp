@@ -53,3 +53,24 @@ const std::string currentDateTime() {
     sprintf (timeBuf, "%02d:%02d:%02d:%03d",tm->tm_hour, tm->tm_min, tm->tm_sec, (tv.tv_usec/1000) );
     return timeBuf;
 }
+
+size_t getFileLineNumber ( std::string & filePath ){
+    // check file begin
+    std::ifstream infile(filePath);
+    if( ! infile.good()){
+        std::cerr << "error in opening file " << filePath << std::endl;
+        exit (1);
+    }
+    // check file end
+    infile.clear();
+    // count variants and individuals begin
+    size_t number_of_line = 0;
+    std::string line;
+    while (std::getline(infile, line)){
+        if( line.length() > 0 ){
+            ++number_of_line;
+        }
+    }
+    infile.close();
+    return number_of_line;
+}

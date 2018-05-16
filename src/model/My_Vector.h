@@ -13,10 +13,10 @@ template <typename T>
 class My_Vector {
     private:
         T * array;
-        unsigned long length;
+        size_t length=0;
     public:
-        My_Vector(const unsigned long & _length);
-        My_Vector(const unsigned long & _length, T * _array);
+        My_Vector(const size_t & _length);
+        My_Vector(const size_t & _length, T * _array);
         My_Vector( const My_Vector & a);
         My_Vector( const My_Vector && a);
         My_Vector( const std::vector<T> & a);
@@ -24,19 +24,21 @@ class My_Vector {
         ~My_Vector();
         T * get_array() const;
 //        void set_array(double * _array);
-        const unsigned long & get_length() const;
+        const size_t & get_length() const;
+        void reSet(const size_t & _length);
 //        void set_length( const unsigned long & new_length );
-        My_Vector &operator=(const My_Vector &);
+        My_Vector<T> &operator=(const My_Vector<T> &);
+
 };
 
 template <typename T>
-My_Vector<T>::My_Vector(const unsigned long & _length){
+My_Vector<T>::My_Vector(const size_t & _length){
         this->length=_length;
         this->array = new T[_length];
 }
 
 template <typename T>
-My_Vector<T>::My_Vector(const unsigned long & _length, T * _array){
+My_Vector<T>::My_Vector(const size_t & _length, T * _array){
         this->length=_length;
         this->array=_array;
 }
@@ -52,8 +54,6 @@ My_Vector<T>::My_Vector(const std::vector<T> & a){
 
 template <typename T>
 My_Vector<T>::My_Vector(){
-        this->length=0;
-        this->array = new T[0];
 }
 
 template <typename T>
@@ -72,7 +72,9 @@ My_Vector<T>::My_Vector( const My_Vector && a){
 
 template <typename T>
 My_Vector<T>::~My_Vector(){
-        delete [] array;
+        if( this->length > 0 ){
+                delete [] array;
+        }
 }
 
 template <typename T>
@@ -84,10 +86,17 @@ T * My_Vector<T>::get_array() const{
 //    this->array=_array;
 //}
 template <typename T>
-const unsigned long & My_Vector<T>::get_length() const{
+const size_t & My_Vector<T>::get_length() const{
         return this->length;
 }
-
+template <typename T>
+void My_Vector<T>::reSet(const size_t & _length){
+        if( this->length > 0 ){
+                delete [] array;
+        }
+        this->length=_length;
+        this->array = new T[_length];
+}
 //void My_Vector::set_length( const unsigned long & new_length ){
 //    this->length=new_length;
 //}
@@ -99,6 +108,5 @@ My_Vector<T> &My_Vector<T>::operator=(const My_Vector<T> & a){
         memcpy(this->array, a.get_array(), sizeof(T)*this->length );
         return * this;
 }
-
 
 #endif //MLMM_CPP_MY_VECTOR_H

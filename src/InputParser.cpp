@@ -37,7 +37,7 @@ const std::string InputParser::getCmdOption( std::string &option) {
     if (itr != this->tokens.end() && ++itr != this->tokens.end()){
         return *itr;
     }
-    return "";
+    return "NA";
 }
 
 std::string InputParser::getCmdOption( const char* o) {

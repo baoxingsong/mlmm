@@ -3,10 +3,16 @@
 //
 
 #include "Variant.h"
+Variant::Variant(){
+    this->id = "NA";
+    this->chromosome="NA";
+    this->genetic_distance=0.0;
+    this->position=0;
+}
 Variant::Variant(const std::string& _chromosome, const std::string& _id,
                  const float & _geneticDistance, const unsigned long & _position){
-    this->id = _id;
     this->chromosome=_chromosome;
+    this->id = _id;
     this->genetic_distance=_geneticDistance;
     this->position=_position;
 }

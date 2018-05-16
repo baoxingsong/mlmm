@@ -27,9 +27,9 @@
 
 
 void emma_test ( phenotype_impl & pi, Kinship_matrix_impl & k_i, Genotype & genotype, const double & man_l, const double & man_u ){
-
     My_matrix<double> x(genotype.get_number_of_individual(), 1);
     int i, j;
+
     for( i=0; i< genotype.get_number_of_individual(); ++i ){
         x.get_matrix()[i][0]=1;
     }
@@ -40,6 +40,7 @@ void emma_test ( phenotype_impl & pi, Kinship_matrix_impl & k_i, Genotype & geno
     double eps = 0.0000001;
     std::string method="REML";
     int maxiter = 100;
+
     Eigen_result eigen_L = _get_eigen_L_( k_i.getKin());
 
     My_matrix<double> xs(genotype.get_number_of_individual(), 1);
@@ -49,6 +50,8 @@ void emma_test ( phenotype_impl & pi, Kinship_matrix_impl & k_i, Genotype & geno
     double p_val;
     std::vector <int> indexs;
     bool has_missing;
+
+
     for( j=0; j<genotype.get_number_of_variant(); ++j ){
         indexs.clear();
         sum=0;
@@ -171,7 +174,7 @@ void emmax_test( phenotype_impl & pi, Kinship_matrix_impl & k_i, Genotype & geno
 }
 
 
-void emmax_test_multi_allic_single_test(phenotype_impl & pi, Kinship_matrix_impl & k_i, Genotype & genotype, const double & man_l, const double & man_u ){
+void emmax_test_multi_allic_single_test(phenotype_impl & pi, Kinship_matrix_impl & k_i, Genotype & genotype, const double & man_l, const double & man_u  ){
 
     int i, j, j_1;
     Emma_result e_er = estimate( pi, k_i, genotype );
@@ -252,7 +255,7 @@ void emmax_test_multi_allic_single_test(phenotype_impl & pi, Kinship_matrix_impl
                 if (p_val == 0.0) {
                     p_val = 0.00000000000000000001;
                 }
-                printf("\t%10.20f\n", p_val);
+                printf("\t%10.20f\n", p_val); // it is good to use \n than std::endl. Since std::endl output the result immediately and less efficient
                 //printf("%s\t%d\t%s\t%10.20f\n", genotype.get_variant_Vector()[j].getChromosome(), genotype.get_variant_Vector()[j].getPosition(), genotype.get_variant_Vector()[j].getId(),  p_val);
             }else if ( allThisStates_vector.size() == 1 && allThisStates_vector[0]!=missing_genotype ){
                 size = 1;
@@ -538,54 +541,88 @@ void emmax_test_multi_allic_multi_test_full_model( phenotype_impl & pi, Kinship_
     }
 }
 
-
-
 void emma_test ( const std::string & phenotype_path, const std::string & genotype_path, const std::string & kinship_file, const double & maf){
     std::string format = "tfam";
+    std::string tfamFile = genotype_path + ".tfam";
+    std::string tpedFile = genotype_path + ".tped";
+
     phenotype_impl pi(phenotype_path, format);
     Kinship_matrix_impl k_i(kinship_file);
-    Genotype genotype = Read_tped_file(genotype_path);
+    uint64_t number_of_individuals = getFileLineNumber ( tfamFile );
+    uint64_t number_of_variants  = getFileLineNumber ( tpedFile );
+    Genotype genotype =  Genotype (number_of_individuals, number_of_variants);
+    Read_tped_file(tfamFile, tpedFile, genotype);
     genotype.onlyKeepThoseIndividuls(pi.getIndividual_ids());
+
     double man_l = maf * pi.getIndividual_ids().size();
     double man_u = (double)pi.getIndividual_ids().size() - man_l;
+
     emma_test ( pi, k_i, genotype, man_l, man_u );
 }
 void emmax_test( const std::string & phenotype_path, const std::string & genotype_path, const std::string & kinship_file, const double & maf ){
     std::string format = "tfam";
+    std::string tfamFile = genotype_path + ".tfam";
+    std::string tpedFile = genotype_path + ".tped";
+
     phenotype_impl pi(phenotype_path, format);
     Kinship_matrix_impl k_i(kinship_file);
-    Genotype genotype = Read_tped_file(genotype_path);
+    uint64_t number_of_individuals = getFileLineNumber ( tfamFile );
+    uint64_t number_of_variants  = getFileLineNumber ( tpedFile );
+    Genotype  genotype =  Genotype(number_of_individuals, number_of_variants);
+    Read_tped_file(tfamFile, tpedFile, genotype);
     genotype.onlyKeepThoseIndividuls(pi.getIndividual_ids());
+
     double man_l = maf * pi.getIndividual_ids().size();
     double man_u = (double)pi.getIndividual_ids().size() - man_l;
     emmax_test ( pi, k_i, genotype, man_l, man_u );
 }
 void emmax_test_multi_allic_single_test( const std::string & phenotype_path, const std::string & genotype_path, const std::string & kinship_file, const double & maf ){
     std::string format = "tfam";
+    std::string tfamFile = genotype_path + ".tfam";
+    std::string tpedFile = genotype_path + ".tped";
+
     phenotype_impl pi(phenotype_path, format);
     Kinship_matrix_impl k_i(kinship_file);
-    Genotype genotype = Read_tped_file(genotype_path);
+    uint64_t number_of_individuals = getFileLineNumber ( tfamFile );
+    uint64_t number_of_variants  = getFileLineNumber ( tpedFile );
+    Genotype genotype = Genotype(number_of_individuals, number_of_variants);
+    Read_tped_file(tfamFile, tpedFile, genotype);
     genotype.onlyKeepThoseIndividuls(pi.getIndividual_ids());
+
     double man_l = maf * pi.getIndividual_ids().size();
     double man_u = (double)pi.getIndividual_ids().size() - man_l;
     emmax_test_multi_allic_single_test ( pi, k_i, genotype, man_l, man_u  );
 }
 void emmax_test_multi_allic_multi_test_null_model( const std::string & phenotype_path, const std::string & genotype_path, const std::string & kinship_file, const double & maf ){
     std::string format = "tfam";
+    std::string tfamFile = genotype_path + ".tfam";
+    std::string tpedFile = genotype_path + ".tped";
+
     phenotype_impl pi(phenotype_path, format);
     Kinship_matrix_impl k_i(kinship_file);
-    Genotype genotype = Read_tped_file(genotype_path);
+    uint64_t number_of_individuals = getFileLineNumber ( tfamFile );
+    uint64_t number_of_variants  = getFileLineNumber ( tpedFile );
+    Genotype genotype =  Genotype(number_of_individuals, number_of_variants);
+    Read_tped_file(tfamFile, tpedFile, genotype);
     genotype.onlyKeepThoseIndividuls(pi.getIndividual_ids());
+
     double man_l = maf * pi.getIndividual_ids().size();
     double man_u = (double)pi.getIndividual_ids().size() - man_l;
     emmax_test_multi_allic_multi_test_null_model ( pi, k_i, genotype, man_l, man_u  );
 }
 void emmax_test_multi_allic_multi_test_full_model( const std::string & phenotype_path, const std::string & genotype_path, const std::string & kinship_file, const double & maf ){
     std::string format = "tfam";
+    std::string tfamFile = genotype_path + ".tfam";
+    std::string tpedFile = genotype_path + ".tped";
+
     phenotype_impl pi(phenotype_path, format);
     Kinship_matrix_impl k_i(kinship_file);
-    Genotype genotype = Read_tped_file(genotype_path);
+    uint64_t number_of_individuals = getFileLineNumber ( tfamFile );
+    uint64_t number_of_variants  = getFileLineNumber ( tpedFile );
+    Genotype genotype = Genotype(number_of_individuals, number_of_variants);
+    Read_tped_file(tfamFile, tpedFile, genotype);
     genotype.onlyKeepThoseIndividuls(pi.getIndividual_ids());
+
     double man_l = maf * pi.getIndividual_ids().size();
     double man_u = (double)pi.getIndividual_ids().size() - man_l;
     emmax_test_multi_allic_multi_test_full_model ( pi, k_i, genotype,man_l, man_u );

@@ -3,6 +3,9 @@
 //
 
 #include "phenotype_impl.h"
+phenotype_impl::phenotype_impl(){
+
+}
 phenotype_impl::phenotype_impl(const std::string & file_path, const std::string & format){
     std::ifstream infile(file_path);
     if( ! infile.good()){

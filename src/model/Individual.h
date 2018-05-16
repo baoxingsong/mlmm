@@ -14,6 +14,7 @@ class Individual {
         std::string maternal_id;
         int sex;
     public:
+        Individual();
         Individual(const std::string& _family_id, const std::string& _individual_id, const std::string _paternal_id,
             const std::string & _maternal_id, const int& _sex);
         const std::string& get_family_id() const;

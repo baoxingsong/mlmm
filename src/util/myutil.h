@@ -28,8 +28,13 @@
 #include <cassert>
 #include <vector>
 #include "../model/My_Vector.h"
-
+#include <fstream>
+#include <regex>
+#include <sstream>
+#include <iostream>
 #include <sys/time.h>
+
+
 
 void split(const std::string &s, std::vector<std::string> &elements);
 //std::vector<std::string> split(const std::string &s, char delim);
@@ -53,5 +58,7 @@ const int argmax(const My_Vector<T> & a){
     }
     return max_i;
 }
+
+size_t getFileLineNumber ( std::string & filePath );
 #endif
 

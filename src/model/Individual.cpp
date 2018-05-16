@@ -3,6 +3,13 @@
 //
 
 #include "Individual.h"
+Individual::Individual(){
+    this->family_id="NA";
+    this->individual_id="NA";
+    this->paternal_id="NA";
+    this->maternal_id="NA";
+    this->sex = 999;
+}
 Individual::Individual(const std::string& _family_id, const std::string& _individual_id, const std::string _paternal_id,
            const std::string & _maternal_id, const int & _sex){
     this->family_id=_family_id;

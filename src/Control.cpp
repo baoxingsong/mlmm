@@ -5,13 +5,12 @@
 #include "Control.h"
 
 int control(int argc, char** argv){
-
+    //check parameter begin
     std::string program = argv[1];
     if (program.compare("-h") == 0 || program.compare("--help") == 0) {
         usage();
         exit(1);
     }
-
     InputParser inputParser(argc, argv);
     std::string phenotype_file = inputParser.getCmdOption("-p");
     std::string genotype_file = inputParser.getCmdOption("-g");
@@ -19,23 +18,27 @@ int control(int argc, char** argv){
     std::string kinship_matrix_file = inputParser.getCmdOption("-k");
     double maf = stod(inputParser.getCmdOption("-m"));
     std::string format = "tfam";
-
-    Genotype genotype;
-
     phenotype_impl pi(phenotype_file, format);
     Kinship_matrix_impl k_i(kinship_matrix_file);
 
+    std::string mapFile = genotype_file + ".map";
+    std::string pedFile = genotype_file + ".ped";
+    std::string tfamFile = genotype_file + ".tfam";
+    std::string tpedFile = genotype_file + ".tped";
+
+    size_t number_of_individuals;
+    size_t number_of_variants;
     if (genotype_file_format.compare("ped") == 0) {
-        genotype = Read_ped_file(genotype_file);
+        number_of_individuals = getFileLineNumber ( pedFile );
+        number_of_variants  = getFileLineNumber ( mapFile );
     } else if (genotype_file_format.compare("tped") == 0) {
-        genotype = Read_tped_file(genotype_file);
+        number_of_individuals = getFileLineNumber ( tfamFile );
+        number_of_variants  = getFileLineNumber ( tpedFile );
     } else {
         std::cerr << "unknown genotype file format" << std::endl;
         usage();
         exit(1);
     }
-    genotype.onlyKeepThoseIndividuls(pi.getIndividual_ids());
-
     std::set<std::string> validateMehtods;
     validateMehtods.insert("emma");
     validateMehtods.insert("emmax");
@@ -48,9 +51,20 @@ int control(int argc, char** argv){
         usage();
         exit(1);
     }
+    //check parameter end
+
+    // prepare data begin
+    Genotype genotype = Genotype(number_of_individuals, number_of_variants);
+    if (genotype_file_format.compare("ped") == 0) {
+        Read_ped_file(mapFile, pedFile, genotype);
+    } else if (genotype_file_format.compare("tped") == 0) {
+        Read_tped_file(tfamFile, tpedFile, genotype);
+    }
+    genotype.onlyKeepThoseIndividuls(pi.getIndividual_ids());
+    //prepare data end
+
     double man_l = maf * pi.getIndividual_ids().size();
     double man_u = (double)pi.getIndividual_ids().size() - man_l;
-
     if (program.compare("emma") == 0) {
         emma_test(pi, k_i, genotype, man_l, man_u);
     } else if (program.compare("emmax") == 0) {
@@ -66,5 +80,18 @@ int control(int argc, char** argv){
         usage();
         exit(1);
     }
+
+    //permutation test begin todo
+    if( inputParser.cmdOptionExists("-m") ){
+        int time = 100;
+        if( inputParser.cmdOptionExists("-t") ) {
+            time = std::stoi(inputParser.getCmdOption("-t"));
+        }
+        int seed = 1000;
+        if( inputParser.cmdOptionExists("-s") ) {
+            seed = std::stoi(inputParser.getCmdOption("-s"));
+        }
+    }
+    //permutation test end
     return 0;
 }

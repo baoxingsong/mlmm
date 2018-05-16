@@ -193,7 +193,7 @@ int newton_reml( double* new_opt_delta, const double & eps, const int & js, doub
     y2=_redll_( x0, eig_R, sq_etas);
     d=eps+1.0;
     while( (d>=eps) && (l!=0) ){
-        std::cout << "y2 " << y2 << std::endl;
+//        std::cout << "y2 " << y2 << std::endl;
         if( fabs(y2)+1.0 == 1.0 ){
             std::cout << "error" << std::endl;
             return -1;
@@ -216,7 +216,7 @@ int newton_reml( double* new_opt_delta, const double & eps, const int & js, doub
 
 Emma_result get_estimates ( const My_Vector<double> & y, const My_matrix<double> & k, const My_matrix<double> & x, const My_matrix<double> & xs, const Eigen_result & eigen_L, int & ngrids, double & llim, double &ulim, double & eps,
                      const std::string & method, const int & maxiter ){
-
+    //std::cout << y.get_length() << "\t" << k.get_num_column() << "\t" << k.get_num_row() << "\t" << x.get_num_row() << std::endl;
     assert(y.get_length() == k.get_num_column() && y.get_length()==k.get_num_row() && y.get_length()==x.get_num_row() );
 
     int i, j;

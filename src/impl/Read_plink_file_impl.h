@@ -14,6 +14,6 @@
 
 #include "../model/model.h"
 #include "../util/util.h"
-Genotype Read_ped_file(const std::string& filePath);
-Genotype Read_tped_file(const std::string& filePath);
+void Read_ped_file(const std::string & mapFile, const std::string & pedFile, Genotype & genotype);
+void Read_tped_file(const std::string & tfamFile, const std::string & tpedFile, Genotype & genotype);
 #endif //MLMM_CPP_READ_PLINK_FILE_IMPL_H

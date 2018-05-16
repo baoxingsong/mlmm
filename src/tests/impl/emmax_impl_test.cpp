@@ -58,10 +58,18 @@ e_r['values']
 */
 
 TEST(get_eigen_R_test_function, c1){
+    std::string format = "tfam";
+    std::string genotype_path = "/Users/song/Dropbox/mlmm_cpp/src/tests/testData/orf";
+    std::string tfamFile = genotype_path + ".tfam";
+    std::string tpedFile = genotype_path + ".tped";
+    uint64_t number_of_individuals = getFileLineNumber ( tfamFile );
+    uint64_t number_of_variants  = getFileLineNumber ( tpedFile );
+    Genotype genotype =  Genotype(number_of_individuals, number_of_variants);
+    Read_tped_file(tfamFile, tpedFile, genotype);
+
     std::string kinship_file = "/Users/song/Dropbox/mlmm_cpp/src/tests/testData/snp.aBN.kinf";
     Kinship_matrix_impl k_i(kinship_file);
 
-    Genotype genotype= Read_tped_file("/Users/song/Dropbox/mlmm_cpp/src/tests/testData/orf");
 
     My_matrix<double> x(genotype.get_number_of_individual(), 1);
     int i, j;
