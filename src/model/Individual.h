@@ -22,5 +22,10 @@ class Individual {
         const std::string& get_paternal_id() const;
         const std::string& get_maternal_id() const;
         const int& get_sex() const;
+        void setFamily_id(const std::string &family_id);
+        void setIndividual_id(const std::string &individual_id);
+        void setPaternal_id(const std::string &paternal_id);
+        void setMaternal_id(const std::string &maternal_id);
+        void setSex(int sex);
 };
 #endif //MLMM_CPP_INDIVIDUAL_H

@@ -31,7 +31,7 @@ void split(const std::string &s, std::vector<std::string> &elements){
         std::string subs;
         iss >> subs;
         if (subs.length() > 0) {
-            elements.push_back(subs);//.push_back(subs);
+            elements.push_back(subs);
         }
     } while (iss);
 }

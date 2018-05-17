@@ -87,7 +87,7 @@ add_executable(mlmm main.cpp
         src/impl/Average_information_impl.h
         src/service/PerMutationTest.cpp
         src/service/PerMutationTest.h
-        src/tests/service/PermutationTest.cpp)
-
-
+        src/tests/service/PermutationTest.cpp
+        src/tests/impl/Read_plink_file_impl_test.cpp
+        )
 target_link_libraries( mlmm gtest gtest_main )

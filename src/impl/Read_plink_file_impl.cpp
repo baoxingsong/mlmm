@@ -1,19 +1,43 @@
 //
 // Created by baoxing on 2/17/18.
 //
-
+/*
+ * Initially, I use the function split implemented in myutil to parse the genotype file while that involes some unnecessary RAM copies
+ * The current implementation use more code and less friendly for code reading, but it is more efficient.
+ * Parsing the initial version of the orf genotype data under the test folder for 1000 times takes about 1m 13s
+ * The current version takes about 46s
+ * **/
 #include "Read_plink_file_impl.h"
 
-void Read_ped_file(const std::string & mapFile, const std::string & pedFile, Genotype & genotype){
+void Read_ped_file(const std::string & mapFile, const std::string & pedFile, Genotype & genotype){ // todo it is not well test yet
     // check file begin
+    int int_temp;
+    uint64_t uint64_temp;
+    int64_t int64_temp;
+    double double_temp;
+
+    std::string subs;
+    std::istringstream iss;
+
     std::ifstream infile_map(mapFile);
     uint64_t index=0;
     std::string line_map;
     while (std::getline(infile_map, line_map)){
-        std::vector<std::string> elements;
-        split(line_map, elements);
-        Variant variant( elements[0], elements[1], stof(elements[2]), stoul(elements[3]));
-        genotype.get_variant_Vector()[index]=variant;
+        iss.clear();
+        iss.str(line_map);
+//        std::cout << line_map << std::endl;
+        iss >> subs;
+//        std::cout << subs << std::endl;
+        genotype.get_variant_Vector()[index].setChromosome(subs);
+        iss >> subs;
+//        std::cout << subs << std::endl;
+        genotype.get_variant_Vector()[index].setId(subs);
+        iss >> double_temp;
+//        std::cout << double_temp << std::endl;
+        genotype.get_variant_Vector()[index].setGenetic_distance(double_temp);
+        iss >> int64_temp;
+//        std::cout << int64_temp << std::endl;
+        genotype.get_variant_Vector()[index].setPosition(int64_temp);
         ++index;
     }
     infile_map.close();
@@ -21,53 +45,117 @@ void Read_ped_file(const std::string & mapFile, const std::string & pedFile, Gen
     std::ifstream infile_ped(pedFile);
     index=0;
     std::string line_ped;
-    while (std::getline(infile_map, line_ped)){
-        std::vector<std::string> elements;
-        split(line_ped, elements);
-        Individual individual(elements[0], elements[1], elements[2], elements[3], stoi(elements[4]) );
-        genotype.get_individual_Vector()[index] = individual;
-        for (int i=6; i< 2 * genotype.get_number_of_variant() + 6; i+=2){
-            int nt1 = stoi(elements[i]);
-            if (nt1 == 0 || nt1>INT8_MAX || nt1<INT8_MIN){
-                genotype.get_genotype_matrix().get_matrix()[index][(i-6)/2]=missing_genotype;
+//    int8_t nt1;
+    int i;
+    std::istringstream iss2;
+    while (std::getline(infile_ped, line_ped)){
+//        std::cout << line_ped << std::endl;
+        iss2.str(line_ped);
+        iss2 >> subs;
+        genotype.get_individual_Vector()[index].setFamily_id(subs);
+        iss2 >> subs;
+        genotype.get_individual_Vector()[index].setIndividual_id(subs);
+        iss2 >> subs;
+        genotype.get_individual_Vector()[index].setPaternal_id(subs);
+        iss2 >> subs;
+        genotype.get_individual_Vector()[index].setMaternal_id(subs);
+        iss2 >> int_temp;
+        genotype.get_individual_Vector()[index].setSex(int_temp);
+        for (i=0; i< genotype.get_number_of_variant()-1; ++i){
+            iss2 >> int64_temp;
+            iss2 >> int64_temp;
+            if (int64_temp == 0 || int64_temp>INT8_MAX || int64_temp<INT8_MIN){
+                genotype.get_genotype_matrix().get_matrix()[index][i]=missing_genotype;
             }else{
-                genotype.get_genotype_matrix().get_matrix()[index][(i-6)/2]=nt1;
+                genotype.get_genotype_matrix().get_matrix()[index][i]=int64_temp;
             }
+//            std::cout << int64_temp << "\t";
         }
+        iss2 >> int64_temp;
+        if (int64_temp == 0 || int64_temp>INT8_MAX || int64_temp<INT8_MIN){
+            genotype.get_genotype_matrix().get_matrix()[index][i] = missing_genotype;
+        }else{
+            genotype.get_genotype_matrix().get_matrix()[index][i] = int64_temp;
+        }
+//        std::cout << int64_temp << std::endl;
         index++;
     }
     infile_ped.close();
 }
 
 void Read_tped_file(const std::string & tfamFile, const std::string & tpedFile, Genotype & genotype){
+    std::string subs;
+    std::istringstream iss;
+
     std::ifstream infile_tfam(tfamFile);
     uint64_t index=0;
-    std::vector<std::string> elements;
     std::string line_tfam;
+    int int_temp;
+    uint64_t uint64_temp;
+    int64_t int64_temp;
+    double double_temp;
     while (std::getline(infile_tfam, line_tfam)){
-        elements.clear();
-        split(line_tfam, elements);
-        Individual individual( elements[0], elements[1], elements[2], elements[3], stoi(elements[4]) );
-        genotype.get_individual_Vector()[index]=individual;
+        iss.str(line_tfam);
+        iss >> subs;
+//        std::cout << subs << std::endl;
+        genotype.get_individual_Vector()[index].setFamily_id(subs);
+        iss >> subs;
+//        std::cout << subs << std::endl;
+        genotype.get_individual_Vector()[index].setIndividual_id(subs);
+        iss >> subs;
+//        std::cout << subs << std::endl;
+        genotype.get_individual_Vector()[index].setPaternal_id(subs);
+        iss >> subs;
+//        std::cout << subs << std::endl;
+        genotype.get_individual_Vector()[index].setMaternal_id(subs);
+        iss >> int_temp;
+//        std::cout << int_temp << std::endl;
+        genotype.get_individual_Vector()[index].setSex(int_temp);
         ++index;
     }
     infile_tfam.close();
-
+    //    for( int_temp=0;int_temp<index;++int_temp ){
+//        std::cout << genotype.get_individual_Vector()[int_temp].get_family_id() << std::endl;
+//    }
+//    std::cout << subs << std::endl;
+    std::istringstream iss2;
     std::ifstream infile_tped(tpedFile);
     index=0;
+    int i;
     std::string line_tped;
     while (std::getline(infile_tped, line_tped)){
-        elements.clear();
-        split(line_tped, elements);
-        Variant variant( elements[0], elements[1], stof(elements[2]), stoul(elements[3]));
-        genotype.get_variant_Vector()[index] = variant;
-        for (int i=4; i< 2 * genotype.get_number_of_individual() + 4; i+=2){
-            int nt1 = stoi(elements[i]);
-            if (nt1 == 0 || nt1>INT8_MAX || nt1<INT8_MIN){
-                genotype.get_genotype_matrix().get_matrix()[(i-4)/2][index] = missing_genotype;
+//        std::cout << line_tped << std::endl;
+        iss2.str(line_tped);
+        iss2 >> subs;
+//        std::cout << subs << std::endl;
+        genotype.get_variant_Vector()[index].setChromosome(subs);
+        iss2 >> subs;
+//        std::cout << subs << std::endl;
+        genotype.get_variant_Vector()[index].setId(subs);
+        iss2 >> uint64_temp;
+        genotype.get_variant_Vector()[index].setGenetic_distance(double_temp);
+//        std::cout << double_temp << std::endl;
+        iss2 >> uint64_temp;
+        genotype.get_variant_Vector()[index].setPosition(uint64_temp);
+//        std::cout << uint64_temp << std::endl;
+//        std::cout << genotype.get_number_of_individual() << std::endl;
+        for (i=0; i< genotype.get_number_of_individual()-1; ++i){
+            iss2 >> int64_temp;
+            iss2 >> int64_temp;
+//            std::cout << int64_temp << "\t";
+            if (int64_temp == 0 || int64_temp>INT8_MAX || int64_temp<INT8_MIN){
+                genotype.get_genotype_matrix().get_matrix()[i][index] = missing_genotype;
             }else{
-                genotype.get_genotype_matrix().get_matrix()[(i-4)/2][index] = nt1;
+                genotype.get_genotype_matrix().get_matrix()[i][index] = int64_temp;
             }
+        }
+        iss2 >> int64_temp;
+//        std::cout << int64_temp << "\t";
+//        std::cout << std::endl;
+        if (int64_temp == 0 || int64_temp>INT8_MAX || int64_temp<INT8_MIN){
+            genotype.get_genotype_matrix().get_matrix()[i][index] = missing_genotype;
+        }else{
+            genotype.get_genotype_matrix().get_matrix()[i][index] = int64_temp;
         }
         ++index;
     }

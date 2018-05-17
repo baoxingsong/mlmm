@@ -33,3 +33,23 @@ const std::string& Individual::get_maternal_id() const{
 const int& Individual::get_sex() const{
     return this->sex;
 }
+
+void Individual::setFamily_id(const std::string &family_id) {
+    Individual::family_id = family_id;
+}
+
+void Individual::setIndividual_id(const std::string &individual_id) {
+    Individual::individual_id = individual_id;
+}
+
+void Individual::setPaternal_id(const std::string &paternal_id) {
+    Individual::paternal_id = paternal_id;
+}
+
+void Individual::setMaternal_id(const std::string &maternal_id) {
+    Individual::maternal_id = maternal_id;
+}
+
+void Individual::setSex(int sex) {
+    Individual::sex = sex;
+}

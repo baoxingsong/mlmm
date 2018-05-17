@@ -12,7 +12,7 @@ class Variant {
         std::string id;
         std::string chromosome;
         float genetic_distance;
-        unsigned long position;
+        uint64_t position;
     public:
         Variant();
         Variant(const std::string& _chromosome, const std::string& _id,
