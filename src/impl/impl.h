@@ -13,4 +13,5 @@
 #include "Read_plink_file_impl.h"
 #include "../util/util.h"
 #include "../model/model.h"
+#include "gemma_impl.h"
 #endif //MLMM_CPP_IMPL_H

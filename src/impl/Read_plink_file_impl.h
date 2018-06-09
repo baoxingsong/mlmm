@@ -5,12 +5,8 @@
 #ifndef MLMM_CPP_READ_PLINK_FILE_IMPL_H
 #define MLMM_CPP_READ_PLINK_FILE_IMPL_H
 #include <string>
-#include <vector>
 #include <fstream>
-#include <map>
-#include <regex>
 #include <sstream>
-#include <assert.h>
 
 #include "../model/model.h"
 #include "../util/util.h"

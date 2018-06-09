@@ -58,8 +58,9 @@ size_t getFileLineNumber ( std::string & filePath ){
     // check file begin
     std::ifstream infile(filePath);
     if( ! infile.good()){
-        std::cerr << "error in opening file " << filePath << std::endl;
-        exit (1);
+        std::cerr << "Error in opening file " << filePath << "\n";
+        std::cerr << "Program terminating"<<std::endl;
+        exit (EXIT_FAILURE);
     }
     // check file end
     infile.clear();

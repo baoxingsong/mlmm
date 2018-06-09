@@ -29,7 +29,7 @@ const std::vector<std::string> &phenotype_impl::getIndividual_ids() const {
 }
 
 void phenotype_impl::setIndividual_ids(const std::vector<std::string> &individual_ids) {
-    phenotype_impl::individual_ids = individual_ids;
+    this->individual_ids = individual_ids;
 }
 
 const std::vector<std::string> &phenotype_impl::getFamily_ids() const {
@@ -37,7 +37,7 @@ const std::vector<std::string> &phenotype_impl::getFamily_ids() const {
 }
 
 void phenotype_impl::setFamily_ids(const std::vector<std::string> &family_ids) {
-    phenotype_impl::family_ids = family_ids;
+    this->family_ids = family_ids;
 }
 
 const My_Vector<double> &phenotype_impl::getPhenotypes() const {
@@ -45,5 +45,5 @@ const My_Vector<double> &phenotype_impl::getPhenotypes() const {
 }
 
 void phenotype_impl::setPhenotypes(const My_Vector<double> &phenotypes) {
-    phenotype_impl::phenotypes = phenotypes;
+    this->phenotypes = phenotypes;
 }

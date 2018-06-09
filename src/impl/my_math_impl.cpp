@@ -126,7 +126,7 @@ double my_gamma(const double & xx) {
     return tmp + log(2.5066282746310005 * ser / x);
 }
 
-double beta(double x, double y) {
+double beta(const double & x, const double & y) {
     if (x <= 0 || y <= 0) {
         return 0;
     }
@@ -134,7 +134,7 @@ double beta(double x, double y) {
 }
 
 
-double fi(int N, double x, double a, double b) {
+double fi(const int & N, const double & x, const double & a, const double & b) {
     int n = N / 2;
     double f = 0.0, f1, s1, s2, tmpU, tmpV;
     int i;
@@ -149,11 +149,12 @@ double fi(int N, double x, double a, double b) {
     return 1.0 / (1.0 + f);
 }
 
-double incomBeta(double x, double a, double b) {
+double incomBeta(const double & x, const double & a, const double & b) {
+    double precise = 1.0e-30;// if change the value to 1.0e-20 the program does not obviously faster
     if (a <= 0.0 || b <= 0.0) {
         return 0.0;
     }
-    if (fabs(x - 0.0) < 1.0e-30 || fabs(x - 1.0) < 1.0e-30) {
+    if (fabs(x - 0.0) < precise || fabs(x - 1.0) < precise) {
         return 0.0;
     }
 
@@ -167,20 +168,20 @@ double incomBeta(double x, double a, double b) {
         while (1) {
             f1 = fi(2 * n, x, a, b);
             f2 = fi(2 * n + 2, x, a, b);
-            if (fabs(f2 - f1) < 1.0e-30)
+            if (fabs(f2 - f1) < precise)
                 return f2 * c1 * c2 / a / c3;
             else
                 n++;
         }
     } else {
-        if (fabs(x - 0.5) < 1.0e-30 && fabs(a - b) < 1.0e-30)
+        if (fabs(x - 0.5) < precise && fabs(a - b) < precise)
             return 0.5;
         else {
             n = 1;
             while (1) {
                 f1 = fi(2 * n, 1.0 - x, b, a);
                 f2 = fi(2 * n + 2, 1.0 - x, b, a);
-                if (fabs(f2 - f1) < 1.0e-30)
+                if (fabs(f2 - f1) < precise)
                     return 1.0 - f2 * c1 * c2 / b / c3;
                 else
                     n++;
@@ -190,9 +191,116 @@ double incomBeta(double x, double a, double b) {
     return 0;
 }
 
-double sf(double f, int n1, int n2) {
+double sf(double & f, const int & n1, const int & n2) {
     if (f < 0.0)
         f = -f;
     return incomBeta(n2 / (n2 + n1 * f), n2 / 2.0, n1 / 2.0);
 }
 //---get P value from F value and df1 df2---------------------------end
+
+double gam1(const double & x){
+    int i;
+    double y,t,s,u;
+    static double a[11]={ 0.0000677106,-0.0003442342,
+           0.0015397681,-0.0024467480,0.0109736958,
+           -0.0002109075,0.0742379071,0.0815782188,
+           0.4118402518,0.4227843370,1.0};
+    if (x<=0.0){
+        printf("err**x<=0!\n"); return(-1.0);
+    }
+    y=x;
+    if (y<=1.0){
+        t=1.0/(y*(y+1.0));
+        y=y+2.0;
+    }else if (y<=2.0){
+        t=1.0/y;
+        y=y+1.0;
+    }else if (y<=3.0){
+        t=1.0;
+    }else{
+        t=1.0;
+        while (y>3.0){
+            y=y-1.0;
+            t=t*y;
+        }
+    }
+    s=a[0];
+    u=y-2.0;
+    for (i=1; i<=10; i++){
+        s=s*u+a[i];
+    }
+    s=s*t;
+    return(s);
+  }
+
+double gam2(const double & a, const double & x){
+    int n;
+    double p,q,d,s,s1,p0,q0,p1,q1,qq;
+    if ((a<=0.0)||(x<0.0)){
+        if (a<=0.0) printf("err**a<=0!\n");
+          if (x<0.0) printf("err**x<0!\n");
+            return(-1.0);
+    }
+    if (x+1.0==1.0) return(0.0);
+    if (x>1.0e+35) return(1.0);
+    q=log(x); q=a*q; qq=exp(q);
+    if (x<1.0+a){
+        p=a;
+        d=1.0/a;
+        s=d;
+        for (n=1; n<=100; n++){
+            p=1.0+p;
+            d=d*x/p;
+            s=s+d;
+            if (fabs(d)<fabs(s)*1.0e-07){
+                s=s*exp(-x)*qq/gam1(a);
+                return(s);
+            }
+        }
+    }else{
+        s=1.0/x;
+        p0=0.0;
+        p1=1.0;
+        q0=1.0;
+        q1=x;
+        for (n=1; n<=100; n++){
+            p0=p1+(n-a)*p0;
+            q0=q1+(n-a)*q0;
+            p=x*p0+n*p1;
+            q=x*q0+n*q1;
+            if (fabs(q)+1.0!=1.0){
+                s1=p/q;
+                p1=p;
+                q1=q;
+                if (fabs((s1-s)/s1)<1.0e-07){
+                    s=s1*exp(-x)*qq/gam1(a);
+                    return(1.0-s);
+                }
+                s=s1;
+            }
+            p1=p;
+            q1=q;
+        }
+    }
+    printf("a too large !\n");
+    s=1.0-s*exp(-x)*qq/gam1(a);
+    return(s);
+  }
+
+double chii(double x,const int &n){
+    double y;
+    if (x<0.0){
+        x=-x;
+    }
+    y=gam2(n/2.0,x/2.0);
+    return(y);
+}
+  
+
+
+//
+//double chi(double x, int n) {
+//    if (x < 0.0)
+//        x = -x;
+//    return incomBeta(n2 / (n2 + n1 * f), n2 / 2.0, n1 / 2.0);
+//}

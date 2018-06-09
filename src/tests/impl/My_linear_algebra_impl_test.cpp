@@ -488,3 +488,20 @@ TEST(sstq, c1){
         printf("\n");
     }
 }
+TEST(determinant, c1){
+    My_matrix<double> a(4, 4);
+    a.get_matrix()[0][0]=1.0; a.get_matrix()[0][1]=2.0; a.get_matrix()[0][2]=3.0; a.get_matrix()[0][3]=4.0;
+    a.get_matrix()[1][0]=5.0; a.get_matrix()[1][1]=6.0; a.get_matrix()[1][2]=7.0; a.get_matrix()[1][3]=8.0;
+    a.get_matrix()[2][0]=9.0; a.get_matrix()[2][1]=10.0; a.get_matrix()[2][2]=11.0; a.get_matrix()[2][3]=12.0;
+    a.get_matrix()[3][0]=13.0; a.get_matrix()[3][1]=14.0; a.get_matrix()[3][2]=15.0; a.get_matrix()[3][3]=16.0;
+
+    My_matrix<double> b(4, 4);
+    b.get_matrix()[0][0]=3.0; b.get_matrix()[0][1]=-3.0; b.get_matrix()[0][2]=-2.0; b.get_matrix()[0][3]=4.0;
+    b.get_matrix()[1][0]=5.0; b.get_matrix()[1][1]=-5.0; b.get_matrix()[1][2]=1.0; b.get_matrix()[1][3]=8.0;
+    b.get_matrix()[2][0]=11.0; b.get_matrix()[2][1]=8.0; b.get_matrix()[2][2]=5.0; b.get_matrix()[2][3]=-7.0;
+    b.get_matrix()[3][0]=5.0;b.get_matrix()[3][1]=-1.0; b.get_matrix()[3][2]=-3.0; b.get_matrix()[3][3]=-1.0;
+    std::cout << determinant(a) << std::endl;
+    std::cout << determinant(b) << std::endl;
+    ASSERT_EQ(determinant(a), 0.0);
+    ASSERT_TRUE(determinant(b) - 595.0 < 0.0000000001 );
+}

@@ -28,6 +28,6 @@ double _rell_(const double & delta, const Eigen_result & eigen_R, const My_Vecto
 double _redll_( const double & delta, const Eigen_result & eig_R, const My_Vector<double> & sq_etas );
 
 int newton_reml( double* new_opt_delta, const double & eps, const int & js, double delta, Eigen_result & eig_R, My_Vector<double> & sq_etas );
-Emma_result get_estimates ( const My_Vector<double> & y, const My_matrix<double> & k, const My_matrix<double> & x, const My_matrix<double> & xs, const Eigen_result & eigen_L, int & ngrids, double & llim, double &ulim, double & eps,
+Emma_result emma_estimates ( const My_Vector<double> & y, const My_matrix<double> & k, const My_matrix<double> & x, const My_matrix<double> & xs, const Eigen_result & eigen_L, int & ngrids, double & llim, double &ulim, double & eps,
                      const std::string & method, const int & maxiter );
 #endif //MLMM_CPP_EMMAX_IMPL_H

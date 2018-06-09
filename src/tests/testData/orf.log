@@ -1,0 +1,26 @@
+PLINK v1.90b3.37 64-bit (16 May 2016)
+Options in effect:
+  --file orf
+  --make-bed
+  --out orf
+
+Hostname: pc-t1-016
+Working directory: /home/song/Dropbox/mlmm_cpp/src/tests/testData
+Start time: Wed May 30 09:13:57 2018
+
+Random number seed: 1527664437
+15835 MB RAM detected; reserving 7917 MB for main workspace.
+Scanning .ped file... done.
+Performing single-pass .bed write (4547 variants, 134 people).
+--file: orf-temporary.bed + orf-temporary.bim + orf-temporary.fam written.
+4547 variants loaded from .bim file.
+134 people (134 males, 0 females) loaded from .fam.
+134 phenotype values loaded from .fam.
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 134 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+4547 variants and 134 people pass filters and QC.
+Among remaining phenotypes, 0 are cases and 134 are controls.
+--make-bed to orf.bed + orf.bim + orf.fam ... done.
+
+End time: Wed May 30 09:13:57 2018

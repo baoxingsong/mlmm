@@ -34,10 +34,10 @@ void emma_test ( phenotype_impl & pi, Kinship_matrix_impl & k_i, Genotype & geno
         x.get_matrix()[i][0]=1;
     }
 
-    int ngrids = 50;
-    double llim = -10.0;
-    double ulim = 10.0;
-    double eps = 0.0000001;
+    int ngrids = 100;
+    double llim = -5.0;
+    double ulim = 5.0;
+    double eps = 0.00001;
     std::string method="REML";
     int maxiter = 100;
 
@@ -50,8 +50,7 @@ void emma_test ( phenotype_impl & pi, Kinship_matrix_impl & k_i, Genotype & geno
     double p_val;
     std::vector <int> indexs;
     bool has_missing;
-
-
+    int i_index;
     for( j=0; j<genotype.get_number_of_variant(); ++j ){
         indexs.clear();
         sum=0;
@@ -69,12 +68,12 @@ void emma_test ( phenotype_impl & pi, Kinship_matrix_impl & k_i, Genotype & geno
         }
         if( has_missing ){
             mean=sum/count;
-            for( int i_index : indexs ){
-                xs.get_matrix()[i_index][0]=mean;
+            for( i_index=0; i_index<indexs.size(); ++i_index ){
+                xs.get_matrix()[indexs[i_index]][0]=mean;
             }
         }
         std::cout << genotype.get_variant_Vector()[j].getChromosome() << "\t" << genotype.get_variant_Vector()[j].getPosition() << "\t" << genotype.get_variant_Vector()[j].getId();
-        p_val =get_estimates ( pi.getPhenotypes(), k_i.getKin(), x, xs, eigen_L, ngrids, llim, ulim, eps, method, maxiter).getPvalue();
+        p_val = emma_estimates ( pi.getPhenotypes(), k_i.getKin(), x, xs, eigen_L, ngrids, llim, ulim, eps, method, maxiter).getPvalue();
 
         if( p_val == 0.0 ){
             p_val = 0.00000000000000000001;
@@ -89,15 +88,15 @@ Emma_result estimate( phenotype_impl & pi, Kinship_matrix_impl & k_i, Genotype &
     for( i=0; i<genotype.get_number_of_individual(); ++i ){
         x.get_matrix()[i][0]=1;
     }
-    int ngrids = 50;
+    int ngrids = 100;
     double llim = -10.0;
     double ulim = 10.0;
-    double eps = 0.0000001;
+    double eps = 0.00001;
     std::string method="REML";
     int maxiter = 100;
     Eigen_result eigen_L = _get_eigen_L_( k_i.getKin());
     My_matrix<double> x0(genotype.get_number_of_individual(), 0);
-    return get_estimates ( pi.getPhenotypes(), k_i.getKin(), x, x0, eigen_L, ngrids, llim, ulim, eps, method, maxiter); // do some thing here and get several parameters
+    return emma_estimates ( pi.getPhenotypes(), k_i.getKin(), x, x0, eigen_L, ngrids, llim, ulim, eps, method, maxiter); // do some thing here and get several parameters
 
 }
 
@@ -125,6 +124,7 @@ void emmax_test( phenotype_impl & pi, Kinship_matrix_impl & k_i, Genotype & geno
     double sum;
     double count;
     double mean;
+    int i_index;
     std::vector <int> indexs;
     bool has_missing;
     for( j=0; j<genotype.get_number_of_variant(); ++j ) {
@@ -144,8 +144,8 @@ void emmax_test( phenotype_impl & pi, Kinship_matrix_impl & k_i, Genotype & geno
         }
         if(has_missing){
             mean=sum/count;
-            for( int i_index : indexs ){
-                full_x.get_matrix()[i_index][1] = mean;
+            for( i_index=0;i_index<indexs.size();++i_index){
+                full_x.get_matrix()[indexs[i_index]][1] = mean;
             }
         }
         trmul(e_er.getH_sqrt_inv(), full_x, X_t);
@@ -524,7 +524,6 @@ void emmax_test_multi_allic_multi_test_full_model( phenotype_impl & pi, Kinship_
                 for (i = 0; i < n; ++i) {
                     mahalanobis_rss += pow(e_er.getY_t().get_array()[i] - full_x_beta.get_array()[i], 2);
                 }
-
                 h0_rss = e_er.getMahalanobis_rss();
 
                 f_stat = (h0_rss / mahalanobis_rss - 1) * p / freedome1;

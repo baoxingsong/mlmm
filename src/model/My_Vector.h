@@ -28,6 +28,7 @@ class My_Vector {
         void reSet(const size_t & _length);
 //        void set_length( const unsigned long & new_length );
         My_Vector<T> &operator=(const My_Vector<T> &);
+        void set_values_zero();
 
 };
 
@@ -107,6 +108,16 @@ My_Vector<T> &My_Vector<T>::operator=(const My_Vector<T> & a){
         this->array = new T[this->length];
         memcpy(this->array, a.get_array(), sizeof(T)*this->length );
         return * this;
+}
+
+template <typename T>
+void  My_Vector<T>::set_values_zero(){
+        size_t i;
+        T value=0;
+        for( i=0; i<this->get_length(); ++i ){
+                this->get_array()[i]=0;
+        }
+
 }
 
 #endif //MLMM_CPP_MY_VECTOR_H

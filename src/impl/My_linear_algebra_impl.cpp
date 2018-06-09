@@ -6,6 +6,53 @@
 
 //matrix operation begin
 
+double determinant( const My_matrix<double> & _x ){
+    My_matrix<double> x(_x);
+    int16_t i, j, k, is, js, n = x.get_num_column();
+    double f=1.0, det=1.0, q, d;
+    for( k=0; k<(n-1); ++k ){
+        q=0.0;
+        for( i=k; i<n;++i ){
+            for( j=k; j<n;++j ){
+                d=fabs(x.get_matrix()[i][j]);
+                if( d>q ){
+                    q=d;
+                    is=i;
+                    js=j;
+                }
+            }
+        }
+        if( q == 0.0 ){
+            det=0.0;
+            return det;
+        }
+        if( is != k ){
+            f = -f;
+            for( j=k; j<n; ++j ){
+                d=x.get_matrix()[k][j];
+                x.get_matrix()[k][j]=x.get_matrix()[is][j];
+                x.get_matrix()[is][j]=d;
+            }
+        }
+        if( js != k ){
+            f = -f;
+            for( i=k; i<n; ++i ){
+                d=x.get_matrix()[i][js];
+                x.get_matrix()[i][js]=x.get_matrix()[i][k];
+                x.get_matrix()[i][k]=d;
+            }
+        }
+        det = det * x.get_matrix()[k][k];
+        for( i=k+1;i<n;++i ){
+            d = x.get_matrix()[i][k]/x.get_matrix()[k][k];
+            for( j=k+1;j<n;++j ){
+                x.get_matrix()[i][j] -= d*x.get_matrix()[k][j];
+            }
+        }
+    }
+    det = f * det * x.get_matrix()[n-1][n-1];
+    return det;
+}
 
 // inverse matrix
 void inverse_matrix(My_matrix<double>& c){
@@ -637,6 +684,6 @@ Eigen_result eigen( const My_matrix<double> & _a, const double & eps){
 }
 
 Eigen_result eigen( const My_matrix<double> & _a) {
-    double eps = 0.000001;
-    return eigen(_a, eps, 6000, _a.get_num_column());
+    double eps = 0.00000001;
+    return eigen(_a, eps, 60000, _a.get_num_column());
 }

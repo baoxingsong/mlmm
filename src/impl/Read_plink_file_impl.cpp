@@ -20,6 +20,7 @@ void Read_ped_file(const std::string & mapFile, const std::string & pedFile, Gen
     std::istringstream iss;
 
     std::ifstream infile_map(mapFile);
+    // since the file has been opened before, so do not check the success of opening file anymore
     uint64_t index=0;
     std::string line_map;
     while (std::getline(infile_map, line_map)){

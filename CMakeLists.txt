@@ -56,8 +56,8 @@ add_executable(mlmm main.cpp
         src/util/myutil.h
         src/impl/emmax_impl.cpp
         src/impl/emmax_impl.h
-        #       src/impl/gemma_impl.cpp
-        #      src/impl/gemma_impl.h
+        src/impl/gemma_impl.cpp
+        src/impl/gemma_impl.h
         src/impl/my_math_impl.cpp
         src/impl/my_math_impl.h
         src/model/My_matrix.h
@@ -73,6 +73,8 @@ add_executable(mlmm main.cpp
         src/model/model.h
         src/service/emmax_service.cpp
         src/service/emmax_service.h
+        src/service/gemma_service.cpp
+        src/service/gemma_service.h
         src/impl/phenotype_impl.cpp
         src/impl/phenotype_impl.h
         src/tests/impl/phenotype_impl.test.cpp
@@ -89,5 +91,5 @@ add_executable(mlmm main.cpp
         src/service/PerMutationTest.h
         src/tests/service/PermutationTest.cpp
         src/tests/impl/Read_plink_file_impl_test.cpp
-        )
+        src/tests/service/gemma_service_test.cpp src/impl/phenotype_mul_impl.cpp src/impl/phenotype_mul_impl.h src/impl/mt_gemma_impl.cpp src/impl/mt_gemma_impl.h)
 target_link_libraries( mlmm gtest gtest_main )

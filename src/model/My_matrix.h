@@ -17,12 +17,14 @@ class My_matrix {
         My_matrix( const uint64_t & _num_row, const uint64_t & _num_column );
         My_matrix( const My_matrix<T> & obj);
         My_matrix( const My_matrix<T> && obj);
+        void set_values_zero();
         My_matrix();
         ~My_matrix();
         T ** get_matrix() const;
         const uint64_t & get_num_row() const;
         const uint64_t & get_num_column() const;
         My_matrix &operator=(const My_matrix &);
+        void value_copy(const My_matrix<T> & obj);
 };
 
 
@@ -55,6 +57,12 @@ My_matrix<T>::My_matrix( const My_matrix<T> & obj){
 }
 
 template <typename T>
+void My_matrix<T>::value_copy(const My_matrix<T> & obj){
+    for( int i=0; i<this->num_row; ++i ){
+        memcpy(matrix[i], obj.get_matrix()[i], sizeof(T)*this->num_column );
+    }
+}
+template <typename T>
 My_matrix<T>::My_matrix( const My_matrix<T> && obj){
     this->num_row=obj.get_num_row();
     this->num_column=obj.get_num_column();
@@ -63,6 +71,19 @@ My_matrix<T>::My_matrix( const My_matrix<T> && obj){
         this->matrix[i] = new T[num_column];
         memcpy(matrix[i], obj.get_matrix()[i], sizeof(T)*num_column );
     }
+}
+
+template <typename T>
+void  My_matrix<T>::set_values_zero(){
+    int i;
+    int j;
+    T value=0;
+    for( i=0; i<this->num_row; ++i ){
+        for( j=0; j<this->num_column; ++j ){
+            this->matrix[i][j] = value;
+        }
+    }
+
 }
 
 template <typename T>
