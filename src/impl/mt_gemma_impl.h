@@ -10,4 +10,7 @@
 #include "My_linear_algebra_impl.h"
 #include "./gemma_impl.h"
 
+#include "phenotype_impl.h"
+#include "Kinship_matrix_impl.h"
+
 #endif //MLMM_CPP_MT_GEMMA_IMPL_H
