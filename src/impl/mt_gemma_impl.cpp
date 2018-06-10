@@ -3,7 +3,8 @@
 //
 
 #include "mt_gemma_impl.h"
-double EigenProc(const My_matrix<double> & V_g, const My_matrix<double> & V_e, const int & d_size, My_Vector<double> & D_l,
+double EigenProc(const My_matrix<double> & V_g, const My_matrix<double> & V_e, const int & d_size,
+                 My_Vector<double> & D_l,
                  My_matrix<double> & UltVeh, My_matrix<double> & UltVehi) { // here h mean half and i means -1
     double d, logdet_Ve = 0.0;
 
@@ -40,7 +41,8 @@ double EigenProc(const My_matrix<double> & V_g, const My_matrix<double> & V_e, c
         for ( j = 0; j < d_size; j++) {
             V_e_h_temp.get_matrix()[j][i] = eigen_l.get_eigen_vectors().get_matrix()[i][j]*d;
             d=1.0/d;
-            V_e_hi_temp.get_matrix()[j][i] = eigen_l.get_eigen_vectors().get_matrix()[i][j]*d; // since my function return U^t, So the index should be adapted
+            V_e_hi_temp.get_matrix()[j][i] = eigen_l.get_eigen_vectors().get_matrix()[i][j]*d;
+            // since my function return U^t, So the index should be adapted
         }
     }
     for (i = 0; i < d_size; i++ ) {
@@ -70,7 +72,8 @@ double EigenProc(const My_matrix<double> & V_g, const My_matrix<double> & V_e, c
 }
 
 // Qi=(\sum_{k=1}^n x_kx_k^T\otimes(delta_k*Dl+I)^{-1} )^{-1}.
-double CalcQi(const Eigen_result & eigen_r, const My_Vector<double> & D_l, const size_t & n_size, const size_t & d_size, const size_t & c_size, const size_t & dc_size,
+double CalcQi(const Eigen_result & eigen_r, const My_Vector<double> & D_l, const size_t & n_size, const size_t & d_size,
+              const size_t & c_size, const size_t & dc_size,
               const My_matrix<double> & X, My_matrix<double> & Qi) {
 
     double delta, dl, d1, d2, d, logdet_Q;
@@ -90,7 +93,9 @@ double CalcQi(const Eigen_result & eigen_r, const My_Vector<double> & D_l, const
                         d1 = X.get_matrix()[i][k];
                         d2 = X.get_matrix()[j][k];
                         delta = eigen_r.get_eigen_values().get_array()[k];
-                        d += d1 * d2 / (dl * delta + 1.0); // this function was explained in Xiang Zhou and Matthew Stephens (2012). Genome-wide efficient mixed-model analysis for association studies. Nature Genetics 44, 821–824.
+                        d += d1 * d2 / (dl * delta + 1.0);
+                        // this function was explained on Xiang Zhou and Matthew Stephens (2012).
+                        // Genome-wide efficient mixed-model analysis for association studies. Nature Genetics 44, 821–824.
                     }
                 }
                 Q.get_matrix()[i * d_size + l][j * d_size + l]=d;
@@ -110,9 +115,11 @@ double CalcQi(const Eigen_result & eigen_r, const My_Vector<double> & D_l, const
 }
 
 // xHiy=\sum_{k=1}^n x_k\otimes ((delta_k*Dl+I)^{-1}Ul^TVe^{-1/2}y.
-// this function was explained in Xiang Zhou and Matthew Stephens (2012). Genome-wide efficient mixed-model analysis for association studies. Nature Genetics 44, 821–824.
+// this function was explained in Xiang Zhou and Matthew Stephens (2012). Genome-wide efficient mixed-model analysis for
+// association studies. Nature Genetics 44, 821–824.
 void CalcXHiY(const Eigen_result & eigen_r, const My_Vector<double> & D_l,
-              const My_matrix<double> & X, const My_matrix<double> & UltVehiY, const size_t & n_size, const size_t & d_size, const size_t & c_size,
+              const My_matrix<double> & X, const My_matrix<double> & UltVehiY, const size_t & n_size,
+              const size_t & d_size, const size_t & c_size,
               My_Vector<double> & xHiy) {
 
     xHiy.set_values_zero();
@@ -154,29 +161,33 @@ void CalcOmega(const Eigen_result & eigen_r, const My_Vector<double> & D_l, cons
     return;
 }
 
-void UpdateU(const My_matrix<double> &OmegaE, const My_matrix<double> & UltVehiY, const size_t & n_size, const size_t & d_size,
+void UpdateU(const My_matrix<double> &OmegaE, const My_matrix<double> & UltVehiY, const size_t & n_size,
+             const size_t & d_size,
              const My_matrix<double> &UltVehiBX, My_matrix<double> &UltVehiU) {
     size_t i, j;
     for( i=0; i<d_size; ++i ){
         for( j=0; j<n_size; ++j ){
-            UltVehiU.get_matrix()[i][j] = (UltVehiY.get_matrix()[i][j] - UltVehiBX.get_matrix()[i][j])*OmegaE.get_matrix()[i][j];
+            UltVehiU.get_matrix()[i][j] =
+                    (UltVehiY.get_matrix()[i][j] - UltVehiBX.get_matrix()[i][j])*OmegaE.get_matrix()[i][j];
         }
     }
 }
 
-void UpdateE(const My_matrix<double> &UltVehiY, const My_matrix<double> &UltVehiBX, const size_t & n_size, const size_t & d_size,
-             const My_matrix<double> &UltVehiU, My_matrix<double> &UltVehiE) {
+void UpdateE(const My_matrix<double> &UltVehiY, const My_matrix<double> &UltVehiBX, const size_t & n_size,
+             const size_t & d_size, const My_matrix<double> &UltVehiU, My_matrix<double> &UltVehiE) {
 
     size_t i, j;
     for( i=0; i<d_size; ++i ){
         for( j=0; j<n_size; ++j ){
-            UltVehiE.get_matrix()[i][j] = (UltVehiY.get_matrix()[i][j] - UltVehiBX.get_matrix()[i][j]) - UltVehiU.get_matrix()[i][j];
+            UltVehiE.get_matrix()[i][j] = (UltVehiY.get_matrix()[i][j] -
+                                          UltVehiBX.get_matrix()[i][j]) - UltVehiU.get_matrix()[i][j];
         }
     }
     return;
 }
 
-void UpdateL_B(const My_matrix<double> &X, const My_matrix<double> &XXti, const size_t & n_size, const size_t & d_size, const size_t & c_size,
+void UpdateL_B(const My_matrix<double> &X, const My_matrix<double> &XXti, const size_t & n_size, const size_t & d_size,
+               const size_t & c_size,
                const My_matrix<double> &UltVehiY, const My_matrix<double> &UltVehiU,
                My_matrix<double> &UltVehiBX, My_matrix<double> &UltVehiB) {  // (Y-G)/X = beta
     My_matrix<double> YUX(d_size, c_size);
@@ -192,7 +203,8 @@ void UpdateL_B(const My_matrix<double> &X, const My_matrix<double> &XXti, const 
     return;
 }
 
-void UpdateRL_B(const My_Vector<double> & xHiy, const My_matrix<double> & Qi, const size_t & n_size, const size_t & d_size, const size_t & c_size, const size_t & dc_size,
+void UpdateRL_B(const My_Vector<double> & xHiy, const My_matrix<double> & Qi, const size_t & n_size,
+                const size_t & d_size, const size_t & c_size, const size_t & dc_size,
                 My_matrix<double> & UltVehiB) { //QI with size dc * dc  xHiy with size dc
 
     My_Vector<double> b(dc_size);
@@ -214,7 +226,8 @@ void UpdateRL_B(const My_Vector<double> & xHiy, const My_matrix<double> & Qi, co
 }
 
 
-void UpdateV(const Eigen_result & eigen_r, const My_Vector<double> & D_l, const My_matrix<double> & E, const size_t & n_size, const size_t & d_size, const size_t & c_size,
+void UpdateV(const Eigen_result & eigen_r, const My_Vector<double> & D_l, const My_matrix<double> & E,
+             const size_t & n_size, const size_t & d_size, const size_t & c_size,
              const My_matrix<double> & Sigma_uu, const My_matrix<double> & Sigma_ee,
              My_matrix<double> & V_g, My_matrix<double> & V_e) {
 
@@ -679,7 +692,8 @@ void MphCalcBeta(const Eigen_result & eigen_r, const My_matrix<double> & W,
                     for( l=0;l<d_size;++l ){
                         Qi_temp.get_matrix()[i*d_size+k][j*d_size+l] = 0;
                         for( m=0;m<d_size;++m ){
-                            Qi_temp.get_matrix()[i*d_size+k][j*d_size+l] +=  Qi.get_matrix()[i*d_size+k][j*d_size+m]*UltVeh.get_matrix()[m][l];
+                            Qi_temp.get_matrix()[i*d_size+k][j*d_size+l] +=
+                                    Qi.get_matrix()[i*d_size+k][j*d_size+m]*UltVeh.get_matrix()[m][l];
                         }
                     }
                 }
@@ -687,7 +701,8 @@ void MphCalcBeta(const Eigen_result & eigen_r, const My_matrix<double> & W,
                     for (l = 0; l < d_size; ++l) {
                         Vbeta.get_matrix()[i*d_size+k][j*d_size+l] = 0;
                         for( m=0;m<d_size;++m ){
-                            Vbeta.get_matrix()[i*d_size+k][j*d_size+l] += UltVeh.get_matrix()[k][m]*Vbeta.get_matrix()[i * d_size+m][j * d_size+l];
+                            Vbeta.get_matrix()[i*d_size+k][j*d_size+l] +=
+                                    UltVeh.get_matrix()[k][m]*Vbeta.get_matrix()[i * d_size+m][j * d_size+l];
                         }
                     }
                 }
@@ -829,7 +844,8 @@ void Calc_xHi_all(const My_matrix<double> & X, const My_matrix<double> &Hi_all,
 }
 
 // Calculate scalar yHiy.
-double Calc_yHiy(const My_matrix<double> & Y, const My_matrix<double> & Hiy_all, const size_t & n_size, const size_t & d_size) {
+double Calc_yHiy(const My_matrix<double> & Y, const My_matrix<double> & Hiy_all, const size_t & n_size,
+                 const size_t & d_size) {
     double yHiy = 0.0;
     size_t i, j;//k
     for ( i=0; i<n_size; i++) {
@@ -1216,7 +1232,7 @@ void Calc_xHiDHiDHix(const Eigen_result & eigen_r, const My_matrix<double> & Hi,
 //                          mat_dcdc);
             for( l=0; l<dc_size; ++l ){
                 for( m=0; m<dc_size; ++m ){
-                    mat_dcdc.get_matrix()[l][m] += d_Hi_j1i2*xHi.get_matrix()[l][k * d_size + i1]*xHi.get_matrix()[m][k * d_size + j2];
+                    mat_dcdc.get_matrix()[l][m] += d_Hi_j1i2*xHi.get_matrix()[l][k*d_size + i1]*xHi.get_matrix()[m][k*d_size + j2];
                 }
             }
             for( l=0; l<dc_size; ++l ){
@@ -1258,13 +1274,15 @@ void Calc_xHiDHiDHix(const Eigen_result & eigen_r, const My_matrix<double> & Hi,
 //                          mat_dcdc);
                 for( l=0; l<dc_size; ++l ){
                     for( m=0; m<dc_size; ++m ){
-                        mat_dcdc.get_matrix()[l][m] += d_Hi_j1i2*xHi.get_matrix()[l][k * d_size + i1]*xHi.get_matrix()[m][k * d_size + j2];
+                        mat_dcdc.get_matrix()[l][m] += d_Hi_j1i2*xHi.get_matrix()[l][k*d_size+i1]
+                                                                                  *xHi.get_matrix()[m][k*d_size + j2];
                     }
                 }
 
                 for( l=0; l<dc_size; ++l ){
                     for( m=0; m<dc_size; ++m ){
-                        mat_dcdc.get_matrix()[l][m] += d_Hi_j1j2*xHi.get_matrix()[l][k * d_size + i1]*xHi.get_matrix()[m][k * d_size + i2];
+                        mat_dcdc.get_matrix()[l][m] += d_Hi_j1j2*xHi.get_matrix()[l][k * d_size+i1]
+                                                                                  *xHi.get_matrix()[m][k*d_size + i2];
                     }
                 }
 //                gsl_blas_dger(d_Hi_j1j2, &xHi_col_i1.vector, &xHi_col_i2.vector,
@@ -1308,7 +1326,8 @@ void Calc_xHiDHiDHix(const Eigen_result & eigen_r, const My_matrix<double> & Hi,
 
             for( l=0; l<dc_size; ++l ){
                 for( m=0; m<dc_size; ++m ){
-                    mat_dcdc.get_matrix()[l][m] += d_Hi_j1i2*xHi.get_matrix()[l][k * d_size + i1]*xHi.get_matrix()[m][k * d_size + i2];
+                    mat_dcdc.get_matrix()[l][m] += d_Hi_j1i2*xHi.get_matrix()[l][k * d_size+i1]
+                                                                              *xHi.get_matrix()[m][k*d_size + i2];
                 }
             }
 
@@ -1347,7 +1366,8 @@ void Calc_xHiDHiDHix(const Eigen_result & eigen_r, const My_matrix<double> & Hi,
 
             for( l=0; l<dc_size; ++l ){
                 for( m=0; m<dc_size; ++m ){
-                    mat_dcdc.get_matrix()[l][m] += d_Hi_j1i2*xHi.get_matrix()[l][k * d_size + j1]*xHi.get_matrix()[m][k * d_size + j2];
+                    mat_dcdc.get_matrix()[l][m] += d_Hi_j1i2*xHi.get_matrix()[l][k * d_size + j1]*
+                                                                              xHi.get_matrix()[m][k * d_size + j2];
                 }
             }
 //
@@ -1389,7 +1409,8 @@ void Calc_xHiDHiDHix(const Eigen_result & eigen_r, const My_matrix<double> & Hi,
                 mat_dcdc.set_values_zero();
                 for( l=0; l<dc_size; ++l ){
                     for( m=0; m<dc_size; ++m ){
-                        mat_dcdc.get_matrix()[l][m] += d_Hi_j1i2*xHi.get_matrix()[l][k * d_size + i1]*xHi.get_matrix()[m][k * d_size + i2];
+                        mat_dcdc.get_matrix()[l][m] += d_Hi_j1i2*xHi.get_matrix()[l][k * d_size + i1]*
+                                                                                  xHi.get_matrix()[m][k * d_size + i2];
                     }
                 }
 
@@ -1428,7 +1449,8 @@ void Calc_xHiDHiDHix(const Eigen_result & eigen_r, const My_matrix<double> & Hi,
 
                 for( l=0; l<dc_size; ++l ){
                     for( m=0; m<dc_size; ++m ){
-                        mat_dcdc.get_matrix()[l][m] += d_Hi_j1i2*xHi.get_matrix()[l][k * d_size + j1]*xHi.get_matrix()[m][k * d_size + i2];
+                        mat_dcdc.get_matrix()[l][m] += d_Hi_j1i2*xHi.get_matrix()[l][k * d_size + j1]*
+                                                                                  xHi.get_matrix()[m][k * d_size + i2];
                     }
                 }
 //                gsl_blas_dger(d_Hi_i1j2, &xHi_col_j1.vector, &xHi_col_i2.vector,
@@ -1815,7 +1837,8 @@ void Calc_xHiDHiDHiy_all(const size_t & v_size, const Eigen_result & eigen_r,
 //                    Calc_xHiDHiDHiy(eval, Hi, xHi, Hiy, i1, j1, i2, j2,
 //                                    &xHiDHiDHiy_gg.vector, &xHiDHiDHiy_ee.vector,
 //                                    &xHiDHiDHiy_ge.vector);
-                    Calc_xHiDHiDHiy( eigen_r, Hi, xHi, Hiy, i1, j1, i2, j2, n_size, d_size, xHiDHiDHiy_gg, xHiDHiDHiy_ee, xHiDHiDHiy_ge);
+                    Calc_xHiDHiDHiy( eigen_r, Hi, xHi, Hiy, i1, j1, i2, j2, n_size, d_size, xHiDHiDHiy_gg,
+                                     xHiDHiDHiy_ee, xHiDHiDHiy_ge);
                 }
             }
         }
@@ -1860,9 +1883,9 @@ void Calc_xHiDHiDHix_all(const size_t & v_size, const Eigen_result & eigen_r,
                     }
                     for( i=0; i<dc_size; ++i ){
                         for( j=0; j<dc_size; ++j ){
-                            xHiDHiDHix_gg1.get_matrix()[i][j] = xHiDHiDHix_all_gg.get_matrix()[i][(v1 * v_size + v2) * dc_size+j];
-                            xHiDHiDHix_ee1.get_matrix()[i][j] = xHiDHiDHix_all_ee.get_matrix()[i][(v1 * v_size + v2) * dc_size+j];
-                            xHiDHiDHix_ge1.get_matrix()[i][j] = xHiDHiDHix_all_ge.get_matrix()[i][(v1 * v_size + v2) * dc_size+j];
+                            xHiDHiDHix_gg1.get_matrix()[i][j]=xHiDHiDHix_all_gg.get_matrix()[i][(v1*v_size+v2)*dc_size+j];
+                            xHiDHiDHix_ee1.get_matrix()[i][j]=xHiDHiDHix_all_ee.get_matrix()[i][(v1*v_size+v2)*dc_size+j];
+                            xHiDHiDHix_ge1.get_matrix()[i][j]=xHiDHiDHix_all_ge.get_matrix()[i][(v1*v_size+v2)*dc_size+j];
                         }
                     }
 
@@ -1875,7 +1898,8 @@ void Calc_xHiDHiDHix_all(const size_t & v_size, const Eigen_result & eigen_r,
 //                    gsl_matrix_view xHiDHiDHix_ge1 = gsl_matrix_submatrix(
 //                            xHiDHiDHix_all_ge, 0, (v1 * v_size + v2) * dc_size, dc_size,
 //                            dc_size);
-                    Calc_xHiDHiDHix(eigen_r, Hi, xHi, i1, j1, i2, j2, n_size, d_size, dc_size, xHiDHiDHix_gg1, xHiDHiDHix_ee1, xHiDHiDHix_ge1);
+                    Calc_xHiDHiDHix(eigen_r, Hi, xHi, i1, j1, i2, j2, n_size, d_size, dc_size, xHiDHiDHix_gg1,
+                                    xHiDHiDHix_ee1, xHiDHiDHix_ge1);
 
 //                    Calc_xHiDHiDHix(eval, Hi, xHi, i1, j1, i2, j2, &xHiDHiDHix_gg1.matrix,
 //                                    &xHiDHiDHix_ee1.matrix, &xHiDHiDHix_ge1.matrix);
@@ -1896,9 +1920,12 @@ void Calc_xHiDHiDHix_all(const size_t & v_size, const Eigen_result & eigen_r,
 //                        gsl_matrix_memcpy(&xHiDHiDHix_ge2.matrix, &xHiDHiDHix_ge1.matrix);
                         for( i=0; i<dc_size; ++i ) {
                             for (j = 0; j < dc_size; ++j) {
-                                xHiDHiDHix_all_gg.get_matrix()[i][(v2 * v_size + v1) * dc_size+j] = xHiDHiDHix_gg1.get_matrix()[i][j];
-                                xHiDHiDHix_all_ee.get_matrix()[i][(v2 * v_size + v1) * dc_size+j] = xHiDHiDHix_ee1.get_matrix()[i][j];
-                                xHiDHiDHix_all_ge.get_matrix()[i][(v2 * v_size + v1) * dc_size+j] = xHiDHiDHix_ge1.get_matrix()[i][j];
+                                xHiDHiDHix_all_gg.get_matrix()[i][(v2 * v_size + v1) * dc_size+j]
+                                        = xHiDHiDHix_gg1.get_matrix()[i][j];
+                                xHiDHiDHix_all_ee.get_matrix()[i][(v2 * v_size + v1) * dc_size+j]
+                                        = xHiDHiDHix_ee1.get_matrix()[i][j];
+                                xHiDHiDHix_all_ge.get_matrix()[i][(v2 * v_size + v1) * dc_size+j]
+                                        = xHiDHiDHix_ge1.get_matrix()[i][j];
                             }
                         }
                     }
@@ -2254,7 +2281,8 @@ void Calc_yPDPDPy(
     xHiDHiDHixQixHiy.set_values_zero();
     for( i=0; i<dc_size; ++i ){
         for( j=0; j<dc_size; ++j ){
-            xHiDHiDHixQixHiy.get_array()[i] += xHiDHiDHix_all_gg.get_matrix()[i][(v1 * v_size + v2) * dc_size+j] * QixHiy.get_array()[j];
+            xHiDHiDHixQixHiy.get_array()[i] += xHiDHiDHix_all_gg.get_matrix()[i][(v1 * v_size + v2) * dc_size+j]
+                                                                              * QixHiy.get_array()[j];
         }
     }
 
@@ -2271,7 +2299,8 @@ void Calc_yPDPDPy(
     xHiDHiDHixQixHiy.set_values_zero();
     for( i=0; i<dc_size; ++i ){
         for( j=0; j<dc_size; ++j ){
-            xHiDHiDHixQixHiy.get_array()[i] += xHiDHiDHix_all_ee.get_matrix()[i][(v1 * v_size + v2) * dc_size+j] * QixHiy.get_array()[j];
+            xHiDHiDHixQixHiy.get_array()[i] += xHiDHiDHix_all_ee.get_matrix()[i][(v1 * v_size + v2) * dc_size+j]
+                                                                              * QixHiy.get_array()[j];
         }
     }
 //    gsl_blas_dgemv(CblasNoTrans, 1.0, &xHiDHiDHix_ee.matrix, QixHiy, 0.0,
@@ -2286,7 +2315,8 @@ void Calc_yPDPDPy(
     xHiDHiDHixQixHiy.set_values_zero();
     for( i=0; i<dc_size; ++i ){
         for( j=0; j<dc_size; ++j ){
-            xHiDHiDHixQixHiy.get_array()[i] += xHiDHiDHix_all_ee.get_matrix()[i][(v1 * v_size + v2) * dc_size+j] * QixHiy.get_array()[j];
+            xHiDHiDHixQixHiy.get_array()[i] += xHiDHiDHix_all_ee.get_matrix()[i][(v1 * v_size + v2) * dc_size+j]
+                                                                              * QixHiy.get_array()[j];
         }
     }
 
@@ -2589,9 +2619,12 @@ void CalcCRT(const My_matrix<double> & Hessian_inv, const My_matrix<double> & Qi
 //                                         (c_size - 1) * d_size, d_size, d_size);
             for( i=0; i<d_size; ++i ) {
                 for (j = 0; j < d_size; ++j) {
-                    QiMQiMQi_gg_s.get_matrix()[i][j] = QiMQiMQi_gg.get_matrix()[(c_size - 1) * d_size+i][(c_size - 1) * d_size+j];
-                    QiMQiMQi_ge_s.get_matrix()[i][j] = QiMQiMQi_ge.get_matrix()[(c_size - 1) * d_size+i][(c_size - 1) * d_size+j];
-                    QiMQiMQi_ee_s.get_matrix()[i][j] = QiMQiMQi_ee.get_matrix()[(c_size - 1) * d_size+i][(c_size - 1) * d_size+j];
+                    QiMQiMQi_gg_s.get_matrix()[i][j] = QiMQiMQi_gg.get_matrix()[(c_size - 1) * d_size+i][(c_size - 1)
+                                                                                                         * d_size+j];
+                    QiMQiMQi_ge_s.get_matrix()[i][j] = QiMQiMQi_ge.get_matrix()[(c_size - 1) * d_size+i][(c_size - 1)
+                                                                                                         * d_size+j];
+                    QiMQiMQi_ee_s.get_matrix()[i][j] = QiMQiMQi_ee.get_matrix()[(c_size - 1) * d_size+i][(c_size - 1)
+                                                                                                         * d_size+j];
                 }
             }
 
@@ -2658,9 +2691,12 @@ void CalcCRT(const My_matrix<double> & Hessian_inv, const My_matrix<double> & Qi
 
             for( i=0; i<d_size; ++i ){
                 for( j=0; j<d_size; ++j ){
-                    QiMMQi_gg_s.get_matrix()[i][j] = QiMMQi_gg.get_matrix()[(c_size - 1) * d_size+i][(c_size - 1) * d_size+j];
-                    QiMMQi_ge_s.get_matrix()[i][j] = QiMMQi_ge.get_matrix()[(c_size - 1) * d_size+i][(c_size - 1) * d_size+j];
-                    QiMMQi_ee_s.get_matrix()[i][j] = QiMMQi_ee.get_matrix()[(c_size - 1) * d_size+i][(c_size - 1) * d_size+j];
+                    QiMMQi_gg_s.get_matrix()[i][j] = QiMMQi_gg.get_matrix()[(c_size - 1) * d_size+i][(c_size - 1)
+                                                                                                     * d_size+j];
+                    QiMMQi_ge_s.get_matrix()[i][j] = QiMMQi_ge.get_matrix()[(c_size - 1) * d_size+i][(c_size - 1)
+                                                                                                     * d_size+j];
+                    QiMMQi_ee_s.get_matrix()[i][j] = QiMMQi_ee.get_matrix()[(c_size - 1) * d_size+i][(c_size - 1)
+                                                                                                     * d_size+j];
                 }
             }
 //            gsl_matrix_view QiMMQi_gg_s =
@@ -2801,11 +2837,13 @@ void CalcDev(const char func_name, const Eigen_result & eigen_r, const My_matrix
 
 //    Calc_xHiDHixQixHiy_all(xHiDHix_all_g, xHiDHix_all_e, QixHiy,
 //                           xHiDHixQixHiy_all_g, xHiDHixQixHiy_all_e);
-    Calc_xHiDHiDHiy_all(v_size, eigen_r, Hi, xHi, Hiy, n_size, d_size, xHiDHiDHiy_all_gg, xHiDHiDHiy_all_ee, xHiDHiDHiy_all_ge);
+    Calc_xHiDHiDHiy_all(v_size, eigen_r, Hi, xHi, Hiy, n_size, d_size, xHiDHiDHiy_all_gg, xHiDHiDHiy_all_ee,
+                        xHiDHiDHiy_all_ge);
 
 //    Calc_xHiDHiDHiy_all(v_size, eval, Hi, xHi, Hiy, xHiDHiDHiy_all_gg,
 //                        xHiDHiDHiy_all_ee, xHiDHiDHiy_all_ge);
-    Calc_xHiDHiDHix_all(v_size, eigen_r, Hi, xHi, n_size, d_size, dc_size, xHiDHiDHix_all_gg, xHiDHiDHix_all_ee, xHiDHiDHix_all_ge);
+    Calc_xHiDHiDHix_all(v_size, eigen_r, Hi, xHi, n_size, d_size, dc_size, xHiDHiDHix_all_gg, xHiDHiDHix_all_ee,
+                        xHiDHiDHix_all_ge);
 
 //    Calc_xHiDHiDHix_all(v_size, eval, Hi, xHi, xHiDHiDHix_all_gg,
 //                        xHiDHiDHix_all_ee, xHiDHiDHix_all_ge);
@@ -3423,7 +3461,8 @@ void AnalyzePlink(const Eigen_result & eigen_r, const My_matrix<double> & UtW, c
                   const double & p_nr, const size_t & em_iter, const size_t & nr_iter, const size_t & ngrids,
                   const size_t & max_iter, const double & max_prec,
                   const size_t & em_prec, const size_t & nr_prec, const double & eps, const size_t & maxiter,
-                  const char & method, const int & crt, phenotype_impl & pi, Kinship_matrix_impl & k_i, Genotype & genotype) {
+                  const char & method, const int & crt, phenotype_impl & pi, Kinship_matrix_impl & k_i,
+                  Genotype & genotype) {
 
 //    debug_msg("entering");
 //    string file_bed = file_bfile + ".bed";
