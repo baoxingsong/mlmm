@@ -295,7 +295,28 @@ double chii(double x,const int &n){
     y=gam2(n/2.0,x/2.0);
     return(y);
 }
-  
+
+double critchi (const double & p, const double & df) {
+    double  minchisq = 0.0;
+    double  maxchisq = 99999.0;
+    double  chisqval;
+
+    if (p <= 0.0)
+        return (maxchisq);
+    else if (p >= 1.0)
+        return (0.0);
+
+    chisqval = df / sqrt (p);    /* fair first value */
+    while (maxchisq - minchisq > 10e-7) {
+        if ( (1-chii (chisqval, df)) < p) {
+            maxchisq = chisqval;
+        } else {
+            minchisq = chisqval;
+        }
+        chisqval = (maxchisq + minchisq) * 0.5;
+    }
+    return chisqval;
+}
 
 
 //
