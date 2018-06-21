@@ -45,6 +45,7 @@ int control(int argc, char** argv){
     validateMehtods.insert("emmax_test_multi_allic_single_test");
     validateMehtods.insert("emmax_test_multi_allic_multi_test_null_model");
     validateMehtods.insert("emmax_test_multi_allic_multi_test_full_model");
+    validateMehtods.insert("gemma");
 
     if( validateMehtods.find(program) == validateMehtods.end() ){
         std::cerr << "unknown regression model" << std::endl;
@@ -67,6 +68,8 @@ int control(int argc, char** argv){
     double man_u = (double)pi.getIndividual_ids().size() - man_l;
     if (program.compare("emma") == 0) {
         emma_test(pi, k_i, genotype, man_l, man_u);
+    }else if (program.compare("gemma") == 0) {
+        gemma_test(pi, k_i, genotype, man_l, man_u);
     } else if (program.compare("emmax") == 0) {
         emmax_test(pi, k_i, genotype, man_l, man_u);
     } else if (program.compare("emmax_test_multi_allic_single_test") == 0) {

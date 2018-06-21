@@ -91,5 +91,5 @@ add_executable(mlmm main.cpp
         src/service/PerMutationTest.h
         src/tests/service/PermutationTest.cpp
         src/tests/impl/Read_plink_file_impl_test.cpp
-        src/tests/service/gemma_service_test.cpp src/impl/phenotype_mul_impl.cpp src/impl/phenotype_mul_impl.h src/impl/mt_gemma_impl.cpp src/impl/mt_gemma_impl.h)
+        src/tests/service/gemma_service_test.cpp src/impl/phenotype_mul_impl.cpp src/impl/phenotype_mul_impl.h src/impl/mt_gemma_impl.cpp src/impl/mt_gemma_impl.h src/service/mt_gemma_service.cpp src/service/mt_gemma_service.h src/tests/service/mt_gemma_service_test.cpp)
 target_link_libraries( mlmm gtest gtest_main )

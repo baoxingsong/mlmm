@@ -9,7 +9,7 @@ phenotype_impl::phenotype_impl(){
 phenotype_impl::phenotype_impl(const std::string & file_path, const std::string & format){
     std::ifstream infile(file_path);
     if( ! infile.good()){
-        std::cerr << "error in opening kinship matrix file " << file_path << std::endl;
+        std::cerr << "error in opening phenotype file " << file_path << std::endl;
         exit(1);
     }
     std::vector<double> phenotypes_t;
@@ -17,8 +17,8 @@ phenotype_impl::phenotype_impl(const std::string & file_path, const std::string 
     while (std::getline(infile, line)){
         std::vector<std::string> elements;
         split(line, elements);
-        this->individual_ids.push_back(elements[0]);
-        this->family_ids.push_back(elements[1]);
+        this->individual_ids.push_back(elements[1]);
+        this->family_ids.push_back(elements[0]);
         phenotypes_t.push_back(stod(elements[2]));
     }
     this->phenotypes = My_Vector<double>(phenotypes_t);

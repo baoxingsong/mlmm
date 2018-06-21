@@ -51,7 +51,9 @@ void emma_test ( phenotype_impl & pi, Kinship_matrix_impl & k_i, Genotype & geno
     std::vector <int> indexs;
     bool has_missing;
     int i_index;
+    int32_t number_1;
     for( j=0; j<genotype.get_number_of_variant(); ++j ){
+        number_1 = 0;
         indexs.clear();
         sum=0;
         count=0;
@@ -63,22 +65,30 @@ void emma_test ( phenotype_impl & pi, Kinship_matrix_impl & k_i, Genotype & geno
             }else{
                 sum += genotype.get_genotype_matrix().get_matrix()[i][j];
                 count++;
+                if( 1 == genotype.get_genotype_matrix().get_matrix()[i][j] ){
+                    ++number_1;
+                }
             }
             xs.get_matrix()[i][0]=genotype.get_genotype_matrix().get_matrix()[i][j];
         }
-        if( has_missing ){
-            mean=sum/count;
-            for( i_index=0; i_index<indexs.size(); ++i_index ){
-                xs.get_matrix()[indexs[i_index]][0]=mean;
+        if( number_1>= man_l && number_1<=man_u) {
+            if (has_missing) {
+                mean = sum / count;
+                for (i_index = 0; i_index < indexs.size(); ++i_index) {
+                    xs.get_matrix()[indexs[i_index]][0] = mean;
+                }
             }
-        }
-        std::cout << genotype.get_variant_Vector()[j].getChromosome() << "\t" << genotype.get_variant_Vector()[j].getPosition() << "\t" << genotype.get_variant_Vector()[j].getId();
-        p_val = emma_estimates ( pi.getPhenotypes(), k_i.getKin(), x, xs, eigen_L, ngrids, llim, ulim, eps, method, maxiter).getPvalue();
+            std::cout << genotype.get_variant_Vector()[j].getChromosome() << "\t"
+                      << genotype.get_variant_Vector()[j].getPosition() << "\t"
+                      << genotype.get_variant_Vector()[j].getId();
+            p_val = emma_estimates(pi.getPhenotypes(), k_i.getKin(), x, xs, eigen_L, ngrids, llim, ulim, eps, method,
+                                   maxiter).getPvalue();
 
-        if( p_val == 0.0 ){
-            p_val = 0.00000000000000000001;
+            if (p_val == 0.0) {
+                p_val = 0.00000000000000000001;
+            }
+            printf("\t%10.20f\n", p_val);
         }
-        printf("\t%10.20f\n", p_val);
     }
 }
 
@@ -91,18 +101,18 @@ Emma_result estimate( phenotype_impl & pi, Kinship_matrix_impl & k_i, Genotype &
     int ngrids = 100;
     double llim = -10.0;
     double ulim = 10.0;
-    double eps = 0.00001;
+    double eps = 1e-10;
     std::string method="REML";
     int maxiter = 100;
     Eigen_result eigen_L = _get_eigen_L_( k_i.getKin());
     My_matrix<double> x0(genotype.get_number_of_individual(), 0);
     return emma_estimates ( pi.getPhenotypes(), k_i.getKin(), x, x0, eigen_L, ngrids, llim, ulim, eps, method, maxiter); // do some thing here and get several parameters
-
 }
 
 void emmax_test( phenotype_impl & pi, Kinship_matrix_impl & k_i, Genotype & genotype, const double & man_l, const double & man_u ){
     int i, j, j_1;
     Emma_result e_er = estimate( pi, k_i, genotype );
+
     int covariantsNumber = 1;
     int n = genotype.get_number_of_individual();
     int q = covariantsNumber + 1; //test each genotypic variants one by one
@@ -127,10 +137,12 @@ void emmax_test( phenotype_impl & pi, Kinship_matrix_impl & k_i, Genotype & geno
     int i_index;
     std::vector <int> indexs;
     bool has_missing;
+    int32_t number_1;
     for( j=0; j<genotype.get_number_of_variant(); ++j ) {
         indexs.clear();
         sum=0.0;
         count=0.0;
+        number_1=0;
         has_missing=false;
         for( i=0; i< n; ++i ){
             if( genotype.get_genotype_matrix().get_matrix()[i][j] == missing_genotype ){
@@ -139,37 +151,42 @@ void emmax_test( phenotype_impl & pi, Kinship_matrix_impl & k_i, Genotype & geno
             }else{
                 sum += genotype.get_genotype_matrix().get_matrix()[i][j];
                 count++;
+                if( 1 == genotype.get_genotype_matrix().get_matrix()[i][j] ){
+                    ++number_1;
+                }
             }
             full_x.get_matrix()[i][1] = genotype.get_genotype_matrix().get_matrix()[i][j];
         }
-        if(has_missing){
-            mean=sum/count;
-            for( i_index=0;i_index<indexs.size();++i_index){
-                full_x.get_matrix()[indexs[i_index]][1] = mean;
+        if( number_1>= man_l && number_1<=man_u){
+            if(has_missing){
+                mean=sum/count;
+                for( i_index=0;i_index<indexs.size();++i_index){
+                    full_x.get_matrix()[indexs[i_index]][1] = mean;
+                }
             }
-        }
-        trmul(e_er.getH_sqrt_inv(), full_x, X_t);
-        lsq(X_t, e_er.getY_t(), beta_est);
+            trmul(e_er.getH_sqrt_inv(), full_x, X_t);
+            lsq(X_t, e_er.getY_t(), beta_est);
 
-        for( i=0; i<n; ++i ){
-            x_beta.get_array()[i] = 0;
-            for( j_1=0; j_1<q; ++j_1 ){
-                x_beta.get_array()[i] += X_t.get_matrix()[i][j_1]*beta_est.get_array()[j_1];
+            for( i=0; i<n; ++i ){
+                x_beta.get_array()[i] = 0;
+                for( j_1=0; j_1<q; ++j_1 ){
+                    x_beta.get_array()[i] += X_t.get_matrix()[i][j_1]*beta_est.get_array()[j_1];
+                }
             }
-        }
 
-        mahalanobis_rss = 0.0;
-        for ( i=0; i<n; ++i ){
-            mahalanobis_rss += pow( e_er.getY_t().get_array()[i]-x_beta.get_array()[i], 2);
+            mahalanobis_rss = 0.0;
+            for ( i=0; i<n; ++i ){
+                mahalanobis_rss += pow( e_er.getY_t().get_array()[i]-x_beta.get_array()[i], 2);
+            }
+            f_stat = ( h0_rss / mahalanobis_rss - 1) * p / freedome1;
+            p_val = sf(f_stat, freedome1, p);
+            std::cout << genotype.get_variant_Vector()[j].getChromosome() << "\t" << genotype.get_variant_Vector()[j].getPosition() << "\t" << genotype.get_variant_Vector()[j].getId();
+            if( p_val == 0.0 ){
+                p_val = 0.00000000000000000001;
+            }
+            printf("\t%10.20f\n", p_val);
+            //printf("%s\t%d\t%s\t%10.20f\n", genotype.get_variant_Vector()[j].getChromosome(), genotype.get_variant_Vector()[j].getPosition(), genotype.get_variant_Vector()[j].getId(),  p_val);
         }
-        f_stat = ( h0_rss / mahalanobis_rss - 1) * p / freedome1;
-        p_val = sf(f_stat, freedome1, p);
-        std::cout << genotype.get_variant_Vector()[j].getChromosome() << "\t" << genotype.get_variant_Vector()[j].getPosition() << "\t" << genotype.get_variant_Vector()[j].getId();
-        if( p_val == 0.0 ){
-            p_val = 0.00000000000000000001;
-        }
-        printf("\t%10.20f\n", p_val);
-        //printf("%s\t%d\t%s\t%10.20f\n", genotype.get_variant_Vector()[j].getChromosome(), genotype.get_variant_Vector()[j].getPosition(), genotype.get_variant_Vector()[j].getId(),  p_val);
     }
 }
 

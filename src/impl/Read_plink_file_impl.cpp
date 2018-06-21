@@ -12,7 +12,6 @@
 void Read_ped_file(const std::string & mapFile, const std::string & pedFile, Genotype & genotype){ // todo it is not well test yet
     // check file begin
     int int_temp;
-    uint64_t uint64_temp;
     int64_t int64_temp;
     double double_temp;
 
@@ -133,7 +132,7 @@ void Read_tped_file(const std::string & tfamFile, const std::string & tpedFile, 
         iss2 >> subs;
 //        std::cout << subs << std::endl;
         genotype.get_variant_Vector()[index].setId(subs);
-        iss2 >> uint64_temp;
+        iss2 >> double_temp;
         genotype.get_variant_Vector()[index].setGenetic_distance(double_temp);
 //        std::cout << double_temp << std::endl;
         iss2 >> uint64_temp;

@@ -608,7 +608,7 @@ int sstq(int & n, double * b, double *c, double **q, double eps, int l) {
 Eigen_result eigen( const My_matrix<double> & a, const double & eps, const int & l, const int & keep) {
     int t = a.get_num_column();
     int toDelete = t - keep;
-    int i, j, k;
+    int i, j;
     double *b = new double[t];
     double *c = new double[t];
     double ** q = new double *[t];
@@ -618,62 +618,64 @@ Eigen_result eigen( const My_matrix<double> & a, const double & eps, const int &
 
     strq(a,q,b,c);
 
-    k=sstq(t,b,c,q,eps,l);
+    sstq(t,b,c,q,eps,l);
 
     My_Vector<double> eigen_values(t);
-    My_Vector<double> eigen_values_o(t);
-    My_matrix<double> v_o(t, t);
     for( i=0; i<t; ++i ) {
-        eigen_values.get_array()[i]=b[i];
-        eigen_values_o.get_array()[i]=b[i];
-        for( j=0; j<t; ++j ) {
-            v_o.get_matrix()[i][j] = q[i][j];
-        }
+        eigen_values.get_array()[i] = fabs(b[i]);
     }
 
     std::sort(eigen_values.get_array(), eigen_values.get_array() + eigen_values.get_length());
-    std::vector<int> order;
+    std::map<int, int> order;
     std::map<int, int> rev_order;
     std::set<int> includedIndexs;
     for( i=0; i<a.get_num_row(); ++i ){
         for( j=0; j<a.get_num_row(); ++j ){
-            if( (eigen_values.get_array()[j] == eigen_values_o.get_array()[i]) && includedIndexs.find(j)==includedIndexs.end() ){
-                int temp_song = order.size();
-                rev_order[j]=temp_song;
-                order.push_back(j);
+            if( (eigen_values.get_array()[j] == fabs(b[i])) && includedIndexs.find(j)==includedIndexs.end() ){
+                rev_order[j] = i;
+                order[i] = j;
                 includedIndexs.insert(j);
             }
         }
     }
-
-    delete [] b;
     delete [] c;
-    for( i=0; i<t; ++i ) {
-        delete [] q[i];
-    }
     if( keep >0 && keep< t){
         My_Vector<double> eigen_values1(keep);
         My_matrix<double> v(keep, t);
         for( i=0; i<keep; ++i ){
-            eigen_values1.get_array()[i] = eigen_values.get_array()[toDelete+i];
+            eigen_values1.get_array()[i] = b[rev_order[toDelete+i]];
             for( j=0; j<a.get_num_row(); ++j ) {
-                v.get_matrix()[i][j] = v_o.get_matrix()[rev_order[j]][i];
+                v.get_matrix()[i][j] = q[j][rev_order[toDelete+i]];
             }
         }
         Eigen_result eigen_result(eigen_values1, v);
+
+        for( i=0; i<t; ++i ) {
+            delete [] q[i];
+        }
+        delete [] b;
         return eigen_result;
     }else{
         My_matrix<double> v(t, t);
-        assert(order.size()== a.get_num_row());
         for( i=0; i<a.get_num_row(); ++i ){
             for( j=0; j<a.get_num_row(); ++j ) {
-                v.get_matrix()[order[j]][i] = v_o.get_matrix()[i][j]; // change order and transform
+                v.get_matrix()[order[j]][i] = q[i][j]; // change order and transform
             }
         }
-        Eigen_result eigen_result(eigen_values, v);
+        My_Vector<double> eigen_values1(t);
+        for( i=0; i<t; ++i ) {
+            eigen_values1.get_array()[i] = b[rev_order[i]];
+        }
+        Eigen_result eigen_result(eigen_values1, v);
+
+        for( i=0; i<t; ++i ) {
+            delete [] q[i];
+        }
+        delete [] b;
         return eigen_result;
     }
 }
+
 Eigen_result eigen( const My_matrix<double> & _a, const int & keep){
     double eps = 0.000001;
     return eigen( _a, eps, 6000, keep);

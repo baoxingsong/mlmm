@@ -10,7 +10,7 @@ http://doc.goldenhelix.com/SVS/latest/svsmanual/mixedModelMethods/overview.html#
 """
 
 import sys
-this_path = "/Users/song/Dropbox/PycharmProjects/myEmmax"
+this_path = "/home/who/Dropbox/PycharmProjects/myEmmax"
 sys.path = [this_path] + sys.path
 
 import numpy as np
@@ -702,11 +702,12 @@ def emma(genotypes, phenotypes, k, cofactors=None, f_test=True, lrt_test=True, m
     res = lmm.emma_test(genotypes, f_test=f_test, lrt_test=lrt_test, maf=maf, outPutFile=outPutFile)
     return res
 
-ped = parse_plink_tped_file("/Users/song/Dropbox/mlmm_cpp/src/tests/testData/orf")
-k1 = np.loadtxt("/Users/song/Dropbox/mlmm_cpp/src/tests/testData/snp.aBN.kinf") # this is the kinship matrix
+
+ped = parse_plink_tped_file("/home/who/Dropbox/mlmm_cpp/src/tests/testData/mouse_hs1940")
+k1 = np.loadtxt("/home/who/Dropbox/mlmm_cpp/src/tests/testData/mouse_hs1940.BN.kinf") # this is the kinship matrix
 k1 = np.mat(k1)
 #k = scale_k(k)
-phe = parse_plink_fam_phenotype_file("/Users/song/Dropbox/mlmm_cpp/src/tests/testData/phenotype.tfam")
+phe = parse_plink_fam_phenotype_file("/home/who/Dropbox/mlmm_cpp/src/tests/testData/mt_phenotype_2")
 
 n_individual = len(phe.individuals)
 individual_ids = []

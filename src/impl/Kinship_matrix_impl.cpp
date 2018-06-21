@@ -79,7 +79,7 @@ Kinship_matrix_impl::Kinship_matrix_impl(const std::string & kin_file_path){
     while (std::getline(infile, line)){
         std::vector<std::string> elements_t;
         split(line, elements_t);
-        assert(elements_t.size() == k.get_num_column());
+//        assert(elements_t.size() == k.get_num_column());
         for( i=0; i<this->kin.get_num_column(); ++i  ){
             this->kin.get_matrix()[line_index][i] = stod(elements_t[i]);
         }

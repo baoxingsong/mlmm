@@ -10,15 +10,15 @@
 #include <algorithm>
 #include <set>
 #include <vector>
+
 template <typename T>
 T sum_of_a_vector( const My_Vector<T> & a ){
     double dsum=0;
     for (int i=0; i<a.get_length(); i++){
-        dsum+=a.get_array()[i];
+        dsum += a.get_array()[i];
     }
     return dsum;
 }
-
 
 template <typename T>
 T sum_of_powed_vector(const My_Vector<T> & a, const int & ex){
@@ -29,10 +29,8 @@ T sum_of_powed_vector(const My_Vector<T> & a, const int & ex){
     return ReSum;
 }
 
-
 template <typename T1, typename T2, typename T3>
 void sum_of_two_vectors( const My_Vector<T1> & a, const My_Vector<T2> & b, My_Vector<T3> & c ){
-//    assert(a.get_length() == b.get_length() && c.get_length()==a.get_length());
     for (int i=0; i<a.get_length(); i++){
         c.get_array()[i] = a.get_array()[i]+b.get_array()[i];
     }
@@ -40,7 +38,6 @@ void sum_of_two_vectors( const My_Vector<T1> & a, const My_Vector<T2> & b, My_Ve
 
 template <typename T1, typename T2, typename T3>
 void sum_of_a_vector_a_number(const My_Vector<T1> & a, const T2 & z, My_Vector<T3> & c ){
-//    assert( c.get_length()==a.get_length());
     for (int i=0; i<a.get_length(); i++){
         c.get_array()[i]=a.get_array()[i]+z;
     }
@@ -48,7 +45,6 @@ void sum_of_a_vector_a_number(const My_Vector<T1> & a, const T2 & z, My_Vector<T
 
 template <typename T>
 void production_of_two_vectors( const My_Vector<T> & a, const My_Vector<T> & b, My_Vector<T> & c ){
-//    assert(a.get_length() == b.get_length()&& c.get_length()==a.get_length());
     for (int i=0; i<a.get_length(); i++){
         c.get_array()[i] = a.get_array()[i] * b.get_array()[i];
     }
@@ -56,7 +52,6 @@ void production_of_two_vectors( const My_Vector<T> & a, const My_Vector<T> & b, 
 
 template <typename T1, typename T2, typename T3>
 void quotient_of_two_vectors(const My_Vector<T1> & a, const My_Vector<T2> & b,  My_Vector<T2> & c ){
-//    assert(a.get_length() == b.get_length()&& c.get_length()==a.get_length());
     for (int i=0; i<a.get_length(); i++){
         c.get_array()[i] = a.get_array()[i] / b.get_array()[i];
     }
@@ -64,7 +59,6 @@ void quotient_of_two_vectors(const My_Vector<T1> & a, const My_Vector<T2> & b,  
 
 template <typename T>
 void append_two_matrix(const My_matrix<T> & a, const My_matrix<T> & b, My_matrix<T> & c){
-//    assert( a.get_num_row() == b.get_num_row() && a.get_num_row()==c.get_num_row() && a.get_num_column()+b.get_num_column()==c.get_num_column());
     int i, j;
     for( i=0; i<a.get_num_row(); ++i ){
         for( j=0; j<a.get_num_column(); ++j ){
@@ -78,13 +72,12 @@ void append_two_matrix(const My_matrix<T> & a, const My_matrix<T> & b, My_matrix
 
 template <typename T>
 void trmul(const My_matrix<T> & a, const My_matrix<T> & b, My_matrix<T> & c){
-//    assert( a.get_num_column() == b.get_num_row() && a.get_num_row()==c.get_num_row() && b.get_num_column()==c.get_num_column());
     int i, j, l;
+    c.set_values_zero();
     for (i = 0; i < a.get_num_row(); ++i) {
         for (j = 0; j < b.get_num_column(); ++j) {
-            c.get_matrix()[i][j] = 0.0;
             for (l = 0; l < a.get_num_column(); ++l) {
-                c.get_matrix()[i][j] = c.get_matrix()[i][j] + a.get_matrix()[i][l] * b.get_matrix()[l][j];
+                c.get_matrix()[i][j] += a.get_matrix()[i][l] * b.get_matrix()[l][j];
             }
         }
     }
@@ -92,8 +85,7 @@ void trmul(const My_matrix<T> & a, const My_matrix<T> & b, My_matrix<T> & c){
 
 template <typename T>
 void trmul(const My_matrix<T> & a, const My_Vector<T> & b, My_Vector<T> & c){
-//    assert( a.get_num_column() == b.get_num_row() && a.get_num_row()==c.get_num_row() && b.get_num_column()==c.get_num_column());
-    int i, j, l;
+    int i, j;
     c.set_values_zero();
     for (i = 0; i < a.get_num_row(); ++i) {
         for (j = 0; j < a.get_num_column(); ++j) {
@@ -102,10 +94,8 @@ void trmul(const My_matrix<T> & a, const My_Vector<T> & b, My_Vector<T> & c){
     }
 }
 
-
 template <typename T>
 void T_matrix( const My_matrix<T> & a, My_matrix<T> & b){
-//    assert(a.get_num_row()==b.get_num_column() && a.get_num_column()==b.get_num_row());
     int i, j;
     for( i=0; i<a.get_num_row(); ++i ){
         for ( j=0; j<a.get_num_column(); ++j ){
@@ -113,6 +103,7 @@ void T_matrix( const My_matrix<T> & a, My_matrix<T> & b){
         }
     }
 }
+
 double determinant( const My_matrix<double> & x );
 void inverse_matrix(My_matrix<double> & c);
 Qr_decomposition_result qr_decomposition( const My_matrix<double> & _a);

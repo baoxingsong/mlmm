@@ -14,4 +14,5 @@
 #include "../util/util.h"
 #include "../model/model.h"
 #include "gemma_impl.h"
+#include "mt_gemma_impl.h"
 #endif //MLMM_CPP_IMPL_H

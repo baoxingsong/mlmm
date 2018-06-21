@@ -8,6 +8,7 @@
 #include "../util/util.h"
 #include "../model/model.h"
 #include "My_linear_algebra_impl.h"
+#include <iomanip>
 Eigen_result _get_eigen_L_(const My_matrix<double> & k);
 
 Eigen_result _get_eigen_R_(const My_matrix<double> & x, const My_matrix<double> & k);
@@ -27,7 +28,14 @@ double _rell_(const double & delta, const Eigen_result & eigen_R, const My_Vecto
 // diffrentiated log-likelihoods (*2) (eq. 9 from paper)
 double _redll_( const double & delta, const Eigen_result & eig_R, const My_Vector<double> & sq_etas );
 
-int newton_reml( double* new_opt_delta, const double & eps, const int & js, double delta, Eigen_result & eig_R, My_Vector<double> & sq_etas );
-Emma_result emma_estimates ( const My_Vector<double> & y, const My_matrix<double> & k, const My_matrix<double> & x, const My_matrix<double> & xs, const Eigen_result & eigen_L, int & ngrids, double & llim, double &ulim, double & eps,
-                     const std::string & method, const int & maxiter );
+//int newton_reml( double  new_opt_delta, const double & eps, const int & js, Eigen_result & eig_R, My_Vector<double> & sq_etas );
+//int newton_reml( double* new_opt_delta, const double & eps, const int & js, double delta, Eigen_result & eig_R, My_Vector<double> & sq_etas );
+Emma_result emma_estimates ( const My_Vector<double> & y, const My_matrix<double> & k, const My_matrix<double> & x,
+                             const My_matrix<double> & xs, const Eigen_result & eigen_L, const int & ngrids,
+                             const double & llim, const double &ulim, const double & eps,
+                            const std::string & method, const int & maxiter );
+Emma_result emma_estimates ( const My_Vector<double> & y, const My_matrix<double> & k, const My_matrix<double> & x,
+                             const My_matrix<double> & xs, const Eigen_result & eigen_L, const int & ngrids,
+                             const double & llim, const double &ulim, const double & eps,
+                             const std::string & method, const int & maxiter, double & delta);
 #endif //MLMM_CPP_EMMAX_IMPL_H

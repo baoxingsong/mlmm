@@ -119,9 +119,9 @@ double my_gamma(const double & xx) {
     y = x = xx;
     tmp = (x + 0.5) * log(x + 5.5) - (x + 5.5);
     ser = 1.000000000190015;
-    for (int j = 0; j < 6; j ++) {
+    for (int j = 0; j < 6; ++j) {
         ser += cof[j] / (y + 1);
-        y = y + 1;
+        ++y;
     }
     return tmp + log(2.5066282746310005 * ser / x);
 }
@@ -138,7 +138,7 @@ double fi(const int & N, const double & x, const double & a, const double & b) {
     int n = N / 2;
     double f = 0.0, f1, s1, s2, tmpU, tmpV;
     int i;
-    for (i = n; i >= 1; i--) {
+    for (i = n; i >= 1; --i) {
         tmpU = (a + 2.0 * i - 1.0) * (a + 2.0 * i);
         s2 = i * (b - i) * x / tmpU;
         f1 = s2 / (1.0 + f);

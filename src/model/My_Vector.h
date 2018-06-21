@@ -80,7 +80,7 @@ My_Vector<T>::~My_Vector(){
 
 template <typename T>
 T * My_Vector<T>::get_array() const{
-        return this->array;
+    return this->array;
 }
 //
 //void My_Vector::set_array(double * _array){
@@ -88,15 +88,15 @@ T * My_Vector<T>::get_array() const{
 //}
 template <typename T>
 const size_t & My_Vector<T>::get_length() const{
-        return this->length;
+    return this->length;
 }
 template <typename T>
 void My_Vector<T>::reSet(const size_t & _length){
-        if( this->length > 0 ){
-                delete [] array;
-        }
-        this->length=_length;
-        this->array = new T[_length];
+    if( this->length > 0 ){
+        delete [] array;
+    }
+    this->length=_length;
+    this->array = new T[_length];
 }
 //void My_Vector::set_length( const unsigned long & new_length ){
 //    this->length=new_length;
@@ -113,11 +113,9 @@ My_Vector<T> &My_Vector<T>::operator=(const My_Vector<T> & a){
 template <typename T>
 void  My_Vector<T>::set_values_zero(){
         size_t i;
-        T value=0;
         for( i=0; i<this->get_length(); ++i ){
                 this->get_array()[i]=0;
         }
-
 }
 
 #endif //MLMM_CPP_MY_VECTOR_H

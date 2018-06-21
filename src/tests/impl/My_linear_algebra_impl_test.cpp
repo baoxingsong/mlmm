@@ -317,6 +317,66 @@ TEST (eigen, cqr){
     }
 }
 
+TEST (eigen, c2){
+    Kinship_matrix_impl k_i("/home/song/Dropbox/mlmm_cpp/src/tests/testData/mouse_hs1940.BN.kinf");
+    My_matrix<double> c(k_i.getKin());
+    int t = k_i.getKin().get_num_column();
+
+    for( int i=0; i<t; ++i ){
+        c.get_matrix()[i][i]+=1;
+    }
+    double eps=0.0000000000001;
+
+    Eigen_result r1 = eigen(k_i.getKin(), eps, 1000000, k_i.getKin().get_num_column());
+    Eigen_result r2 = eigen(c, eps, 1000000, c.get_num_column());
+    int i, j;
+
+    for( i=0; i<t; ++i ){
+        for( j=0; j<t; ++j ){
+            printf("%12.25f ", r1.get_eigen_vectors().get_matrix()[i][j]);
+            printf("%12.25f ", r2.get_eigen_vectors().get_matrix()[i][j]);
+            std::cout << std::endl;
+            ASSERT_TRUE((fabs(r1.get_eigen_vectors().get_matrix()[i][j])-fabs(r2.get_eigen_vectors().get_matrix()[i][j])) < 0.0000001);
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+
+    for( i=0; i<t; ++i ){
+        printf("%12.25f\n", r1.get_eigen_values().get_array()[i]);
+        ASSERT_TRUE(fabs(r1.get_eigen_values().get_array()[i] -r2.get_eigen_values().get_array()[i]+1.0) < 0.0000001 );
+    }
+
+    for( i=0; i<t; ++i ){
+        printf("%12.25f\n", r1.get_eigen_values().get_array()[i]);
+    }
+    printf("\n\n\n\n\n\n");
+    for( i=0; i<t; ++i ){
+        printf("%12.25f\n", r1.get_eigen_vectors().get_matrix()[0][i]);
+    }
+    std::cout << std::endl;
+    My_matrix<double> this_eig_values(t, t);
+    for( i=0; i<t; ++i ){
+        for( j=0; j<t; ++j ){
+            this_eig_values.get_matrix()[i][j]=0;
+        }
+        this_eig_values.get_matrix()[i][i]=r1.get_eigen_values().get_array()[i];
+    }
+    My_matrix<double> this_eig_vectors(t, t);
+    T_matrix(r1.get_eigen_vectors(), this_eig_vectors);
+
+    My_matrix<double> t1(t, t);
+    trmul(this_eig_vectors, this_eig_values, t1);
+    My_matrix<double> t2(t, t);
+    trmul(t1, r1.get_eigen_vectors(), t2);
+    for( i=0; i<t; ++i ) {
+        for (j = 0; j < t; ++j) {
+            std::cout <<  t2.get_matrix()[i][j] << " " << k_i.getKin().get_matrix()[i][j] << std::endl;
+            ASSERT_TRUE(fabs(t2.get_matrix()[i][j] - k_i.getKin().get_matrix()[i][j]) < 0.00001 );
+        }
+    }
+}
+
 TEST(T_matrix, c1){
     int n=5, m = 6, i, j;
     My_matrix<double> a(n, m);
