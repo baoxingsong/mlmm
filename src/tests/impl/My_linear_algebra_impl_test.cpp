@@ -127,13 +127,12 @@ TEST (inverse_matrix, c1){
     a.get_matrix()[2][0] = 0.1582; a.get_matrix()[2][1] = 1.1675; a.get_matrix()[2][2] = 0.1768; a.get_matrix()[2][3] = 0.1871;
     a.get_matrix()[3][0] = 0.1968; a.get_matrix()[3][1] = 0.2071; a.get_matrix()[3][2] = 1.2168; a.get_matrix()[3][3] = 0.2271;
     My_matrix<double> b(4,4);
-    T_matrix(a,b);
     My_matrix<double> c(a);
     inverse_matrix(c);
     std::cout << "MAT A IS:" << std::endl;
     for ( int i=0; i<4; ++i ){
         for ( int j=0; j<4; ++j ) {
-            std::cout << b.get_matrix()[i][j] << "\t";
+            std::cout << a.get_matrix()[i][j] << "\t";
         }
         std::cout << std::endl;
     }
@@ -142,17 +141,17 @@ TEST (inverse_matrix, c1){
     std::cout << "MAT A- IS:" << std::endl;
     for ( i=0; i<4; ++i ){
         for ( int j=0; j<4; ++j ) {
-            std::cout << a.get_matrix()[i][j] << "\t";
+            std::cout << c.get_matrix()[i][j] << "\t";
         }
         std::cout << std::endl;
     }
     std::cout << std::endl;
 
     std::cout << "MAT AA- IS:" << std::endl;
-    trmul(b, a, c);
+    trmul( a, c, b);
     for ( int i=0; i<4; ++i ){
         for ( int j=0; j<4; ++j ) {
-            std::cout << c.get_matrix()[i][j] << "\t";
+            std::cout << b.get_matrix()[i][j] << "\t";
         }
         std::cout << std::endl;
     }

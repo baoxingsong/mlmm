@@ -33,8 +33,16 @@ void gemma_test ( phenotype_impl & pi, Kinship_matrix_impl & k_i, Genotype & gen
     My_Vector<double> Uty(genotype.get_number_of_individual());
     My_matrix<double> xNUll(genotype.get_number_of_individual(), 0);
     trmul( eigen_L.get_eigen_vectors(), pi.getPhenotypes(), Uty);
+    printf("before before before before before before before before before before before before before before before Chr\tposition\tid\tp_val\n");
+    for (j=0; j<Uty.get_length(); ++j) {
+        std::cout << "j: " << j << " y: " << pi.getPhenotypes().get_array()[j] << " tesp_x: " << w.get_matrix()[j][0]
+                  << " eigen_r: " << eigen_L.get_eigen_values().get_array()[j] << std::endl;
+    }
 
     double l0 = gemma_estimates (pi.getPhenotypes(), Uty, xNUll, w, eigen_L, ngrids, llim, ulim, eps, method, maxiter);
+
+
+    printf("Chr\tposition\tid\tp_val\n");
 
     double l1;
     double dlrt;
@@ -70,7 +78,6 @@ void gemma_test ( phenotype_impl & pi, Kinship_matrix_impl & k_i, Genotype & gen
                       << genotype.get_variant_Vector()[j].getId();
 
             l1 = gemma_estimates(pi.getPhenotypes(), Uty, x, w, eigen_L, ngrids, llim, ulim, eps, method, maxiter);
-            //        printf("\t%10.20f\t%10.20f", l0, l1);
             //dlrt = 2 * log(l1/l0);
             dlrt = 2 * (l1 - l0); // this function on the original publication is confusing
             if( dlrt<0 ){ // if l1 is smaller, it just suggested that, there is something wrong
@@ -81,7 +88,7 @@ void gemma_test ( phenotype_impl & pi, Kinship_matrix_impl & k_i, Genotype & gen
             if (p_val == 0.0) {
                 p_val = 0.00000000000000000001;
             }
-            printf("\t%10.20f\t%10.20f\n", dlrt, p_val);
+            printf("\t%10.20f\n", p_val);
             //return;
         }
     }
@@ -96,12 +103,9 @@ void gemma_test ( const std::string & phenotype_path, const std::string & genoty
     Kinship_matrix_impl k_i(kinship_file);
     uint64_t number_of_individuals = getFileLineNumber ( tfamFile );
     uint64_t number_of_variants  = getFileLineNumber ( tpedFile );
-//    std::cout << number_of_individuals << " " << number_of_individuals << std::endl;
     Genotype genotype =  Genotype (number_of_individuals, number_of_variants);
     Read_tped_file(tfamFile, tpedFile, genotype);
-//    std::cout << genotype.get_number_of_individual() << " " << genotype.get_number_of_variant() << std::endl;
     genotype.onlyKeepThoseIndividuls(pi.getIndividual_ids());
-//    std::cout << genotype.get_number_of_individual() << " " << genotype.get_number_of_variant() << std::endl;
     double man_l = maf * pi.getIndividual_ids().size();
     double man_u = (double)pi.getIndividual_ids().size() - man_l;
 

@@ -415,17 +415,12 @@ int newton_raphson_ll( double & new_lambda, const double & eps, const int & js, 
     y2=_ddsll_(trace_H_1_G_H_1_G, n, yTPxGPxGPxy, yTPxy, ytPxGPxy);
     d=eps+1.0;
     while( (d>=eps) && (l!=0) ){
-        //std::cout << "eps " << eps << " " << l << " " << x1 << " " << x0 << " " << y0 << " " << y1 << " " << y2 << std::endl;
+        x0=x1;
         if( fabs(y1)+1.0 == 1.0 ){
             std::cout << "error" << std::endl;
             return -1;
         }
-        //x1 = x0 - (y1-sqrt(pow(y1, 2) - 2*y0*y2))/y2;
-        //x1 = x0 - (exp(y1)-sqrt(pow(exp(y1), 2) - 2*exp(y0)*exp(y2)))/exp(y2);
         x1 = x0 - y1/y2;
-        //x1 = x0 - exp(y0-y1);
-//        x1 = x0 - (2*y0*y1)/(2*y1*y1 -y1*y2);
-//        x1 = x0 - (y1-sqrt(pow(y1, 2) - 2*y0*y2))/y2;
         get_lambda_theta_p_1_( x1, eigen_L, lambda_theta_p_1, n);
         log_det_H = _get_log_det_H_(lambda_theta_p_1,  n);
         _get_yTH_1_y_s_(Uty, n, lambda_theta_p_1, yTH_1_y, yTH_1H_1H_1_y );
@@ -439,29 +434,13 @@ int newton_raphson_ll( double & new_lambda, const double & eps, const int & js, 
         ytPxGPxy = get_ytPxGPxy( yTPxy, yTPxPxy, x1);
         yTPxGPxGPxy = get_yTPxGPxGPxy(yTPxy, yTPxPxPxy, yTPxPxy, x1);
 
-        y0=_sll_(n, log_det_H, yTPxy);
-        //std::cout << "n " << n << " log_det_H " << log_det_H << " yTPxy " << yTPxy  << std::endl;
         y1=_dsll_(trace_H_1_G, n, ytPxGPxy, yTPxy);
         y2=_ddsll_(trace_H_1_G_H_1_G, n, yTPxGPxGPxy, yTPxy, ytPxGPxy);
-        //std::cout << "eps " << eps << " " << l << " " << x1 << " " << x0 << " " << y0 << " " << y1 << " " << y2 << std::endl;
-        //std::cout << "d " << d << " l " << l << std::endl;
 
         d=fabs(x1-x0);
-//        u=fabs(y0);
-//        if( u>d ){
-//            d=u;
-//        }
-        if( x1 < 10e-5 ){
-            x1 = 10e-5;
-        }
-        if( x1 > 10e5 ){
-            x1 = 10e5;
-        }
-        x0=x1;
         --l;
-        //std::cout << "d " << d << " l " << l << std::endl;
     }
-    new_lambda=x1;
+    new_lambda=x0;
     k=js-l;
     return k;
 }
@@ -471,14 +450,13 @@ int newton_raphson_reml( double & new_lambda, const double & eps, const int & js
                          const int & q, const int & p, double *** wpw, double *** wppw, double *** wpppw, const My_matrix<double> & UtW,
                          const My_Vector<double> & Uty, My_matrix<double> & ypw, My_matrix<double> & yppw, My_matrix<double> & ypppw){ // js maximum number of iteration
     int k=1,l=js;
-    double y0, y1, y2, d,  x0, x1=new_lambda, u;
+    double y1, y2, d,  x0, x1=new_lambda, u;
     x0=new_lambda;
 
     My_Vector<double> lambda_theta_p_1(n);
     double trace_H_1;
     double trace_H_1_H_1;
     get_lambda_theta_p_1_( x1, eigen_L, lambda_theta_p_1, n);
-    double log_det_H = _get_log_det_H_(lambda_theta_p_1,  n);
 
     double yTH_1_y;
     double yTH_1H_1H_1_y;
@@ -499,17 +477,15 @@ int newton_raphson_reml( double & new_lambda, const double & eps, const int & js
     double trace_PP;
     _get_trace_Px_s_( trace_H_1, trace_H_1_H_1, lambda_theta_p_1, UtW, n, q, wpw, wppw, wpppw, trace_P, trace_PP);
 
-
     double trace_Px_G = _get_trace_Px_G_(x1, p, trace_P);
     double trace_Px_G_Px_G = _get_trace_Px_G_Px_G_(x1, p, trace_P, trace_PP);
 
-    double det_WTH_1_W = get_det_WTH_1W_( n, q, UtW, wpw, lambda_theta_p_1 );
 
-    y0=_srll_simple_(p, log_det_H, det_WTH_1_W, yTPxy);
     y1=_dsrll_(trace_Px_G, p, ytPxGPxy, yTPxy);
     y2=_ddsrll_(trace_Px_G_Px_G, p, yTPxGPxGPxy, yTPxy, ytPxGPxy);
     d=eps+1.0;
     while( (d>=eps) && (l!=0) ){
+        x0=x1;
         if( fabs(y2)+1.0 == 1.0 ){
             std::cout << "error" << std::endl;
             return -1;
@@ -517,7 +493,6 @@ int newton_raphson_reml( double & new_lambda, const double & eps, const int & js
         x1 = x0 - y1/y2;
 
         get_lambda_theta_p_1_( x1, eigen_L, lambda_theta_p_1, n);
-        log_det_H = _get_log_det_H_(lambda_theta_p_1,  n);
         _get_yTH_1_y_s_(Uty, n, lambda_theta_p_1, yTH_1_y, yTH_1H_1H_1_y );
 
         _get_yTPxy_( n, y, UtW, Uty, eigen_L, x1, q, lambda_theta_p_1, yTPxy, ypw, wpw );
@@ -530,19 +505,16 @@ int newton_raphson_reml( double & new_lambda, const double & eps, const int & js
         _get_trace_Px_s_( trace_H_1, trace_H_1_H_1, lambda_theta_p_1, UtW, n, q, wpw, wppw, wpppw, trace_P, trace_PP);
         trace_Px_G = _get_trace_Px_G_(x1, p, trace_P);
         trace_Px_G_Px_G = _get_trace_Px_G_Px_G_(x1, p, trace_P, trace_PP);
-        det_WTH_1_W = get_det_WTH_1W_( n, q, UtW, wpw, lambda_theta_p_1 );
-        y0=_srll_simple_(p, log_det_H, det_WTH_1_W, yTPxy);
         y1=_dsrll_(trace_Px_G, p, ytPxGPxy, yTPxy);
         y2=_ddsrll_(trace_Px_G_Px_G, p, yTPxGPxGPxy, yTPxy, ytPxGPxy);
         d=fabs(x1-x0);
-        u=fabs(y0);
-        if( u>d ){
-            d=u;
-        }
-        x0=x1;
+//        u=fabs(y0);
+//        if( u>d ){
+//            d=u;
+//        }
         --l;
     }
-    new_lambda=x1;
+    new_lambda=x0;
     k=js-l;
     return k;
 }
@@ -593,11 +565,6 @@ double gemma_estimates ( const My_Vector<double> & y, const My_Vector<double> & 
         append_two_matrix( w, x, W);
     } else {
         W.value_copy(w);
-    }
-    std::cout << "q " << q << std::endl;
-    for( i=0; i<n; ++i ){
-        std::cout << "y " << y.get_array()[i] << std::endl;
-        std::cout << "W " << W.get_matrix()[i][0] << std::endl;
     }
 
     My_matrix<double> UtW(n, q);
@@ -678,8 +645,6 @@ double gemma_estimates ( const My_Vector<double> & y, const My_Vector<double> & 
 
             lls.get_array()[i] =_srll_simple_(p, log_det_H, det_WTH_1_W, yTPxy);
             dlls.get_array()[i]=_dsrll_(trace_Px_G, p, ytPxGPxy, yTPxy);
-//            std::cout << "lls.get_array()[i] "<< lls.get_array()[i] << " dlls.get_array()[i] " << dlls.get_array()[i] <<std::endl;
-//            printf("inter loop log_det_H:%10.20f\tyTPxy:%10.20f\tlls.get_array()[i]:%10.20f\tdlls.get_array()[i]:%10.20f\n", log_det_H, yTPxy, lls.get_array()[i], dlls.get_array()[i]);
         }
     }else if (method.compare("ML") == 0){
         for( i=0; i<m; ++i ){
@@ -714,7 +679,6 @@ double gemma_estimates ( const My_Vector<double> & y, const My_Vector<double> & 
         if ( dlls.get_array()[i]<0 && last_dll>0 ){
             zero_intervals[i] = lls.get_array()[i];
         }
-//        std::cout << i << " " << zero_intervals[i] << " " << last_dll << std::endl;
         last_dll = dlls.get_array()[i];
     }
 
@@ -756,15 +720,11 @@ double gemma_estimates ( const My_Vector<double> & y, const My_Vector<double> & 
         _get_yTPxy_( n, y, UtW, Uty, eigen_L, x0, q, lambda_theta_p_1, yTPxy, ypw, wpw );
 
         opt_ll = _sll_( n, log_det_H, yTPxy);
-        std::cout << "759 opt_lambda " << opt_lambda << std::endl;
         if (opt_ll < max_ll || std::isnan(opt_ll) ){
             opt_lambda = lambdas.get_array()[max_ll_i];
         }
-        std::cout << "763 opt_lambda " << opt_lambda << std::endl;
     } else {
-        std::cout << " 762 opt_lambda " << opt_lambda << std::endl;
         opt_lambda = lambdas.get_array()[max_ll_i];
-        std::cout << " 764 opt_lambda " << opt_lambda << std::endl;
     }
     // no matter use ml or reml to optimize the parameters, always use the ml function to get the likelyhood
 
@@ -789,7 +749,7 @@ double gemma_estimates ( const My_Vector<double> & y, const My_Vector<double> & 
     delete [] wpppw;
 
     lambda = opt_lambda;
-    std::cout << "792 opt_lambda " << opt_lambda << std::endl;
+//    std::cout << "752 opt_lambda " << opt_lambda << std::endl;
     return opt_ll;
     // this function should return beta and likelihood for p-value computing
 }
