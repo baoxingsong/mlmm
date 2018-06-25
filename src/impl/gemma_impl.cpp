@@ -61,7 +61,8 @@
 //}
 
 // the equations have nothing with lambda value end
-void get_lambda_theta_p_1_( const double & lambda, const Eigen_result & eigen_L, My_Vector<double> & lambda_theta_p_1, const int & n){
+void get_lambda_theta_p_1_( const double & lambda, const Eigen_result & eigen_L, My_Vector<double> & lambda_theta_p_1,
+                            const int & n){
     for ( int i=0; i<n; ++i ){
         lambda_theta_p_1.get_array()[i]=(lambda*eigen_L.get_eigen_values().get_array()[i]+1.0);
     }
@@ -82,7 +83,8 @@ void _get_yTH_1_y_s_(const My_Vector<double> & Uty, const int & n,
 
 // _get_yTPxy_( n, y, UtW, Uty, eigen_L, x0, q, lambda_theta_p_1, yTPxy, ypw, wpw )
 void _get_yTPxy_(const int & n, const My_Vector<double> & y, const My_matrix<double> & UtW, const My_Vector<double> & Uty,
-                 const Eigen_result & eigen_L, const double & lambda, const int & q, const My_Vector<double> & lambda_theta_p_1,
+                 const Eigen_result & eigen_L, const double & lambda, const int & q,
+                 const My_Vector<double> & lambda_theta_p_1,
                  double & yTPxy, My_matrix<double> & ypw, double *** wpw ) {
     yTPxy=0.0;
     int i, j, k, l;
@@ -119,7 +121,8 @@ void _get_yTPxy_(const int & n, const My_Vector<double> & y, const My_matrix<dou
     }
     for( k=0; k < q; ++k ){
         for( j=0; j<q; ++j ){
-            ypw.get_matrix()[j][k+1] = ypw.get_matrix()[j][k+1-1] - ypw.get_matrix()[k][k+1-1]*wpw[j][k][k+1-1]/wpw[k][k][k+1-1];
+            ypw.get_matrix()[j][k+1] = ypw.get_matrix()[j][k+1-1] -
+                                                        ypw.get_matrix()[k][k+1-1]*wpw[j][k][k+1-1]/wpw[k][k][k+1-1];
         }
     }
     // for the ypw term in the function end
@@ -132,9 +135,10 @@ void _get_yTPxy_(const int & n, const My_Vector<double> & y, const My_matrix<dou
     }
 }
 
-void _get_yTPxPxy_(const int & n, const My_Vector<double> & y, const My_matrix<double> & UtW, const My_Vector<double> & Uty,
-                 const Eigen_result & eigen_L, const double & lambda, const int & q, const My_Vector<double> & lambda_theta_p_1,
-                 double & yTPxPxy, const My_matrix<double> & ypw, My_matrix<double> & yppw, double *** wpw, double *** wppw ) {
+void _get_yTPxPxy_(const int & n, const My_Vector<double> & y, const My_matrix<double> & UtW,
+                   const My_Vector<double> & Uty, const Eigen_result & eigen_L, const double & lambda,
+                   const int & q, const My_Vector<double> & lambda_theta_p_1, double & yTPxPxy,
+                   const My_matrix<double> & ypw, My_matrix<double> & yppw, double *** wpw, double *** wppw ) {
     int i, j, k, l;
     yTPxPxy=0;
     //for aTPiPib begin
@@ -154,7 +158,8 @@ void _get_yTPxPxy_(const int & n, const My_Vector<double> & y, const My_matrix<d
     for( k=0; k < q; ++k ){
         for( i=0; i<q; ++i ){
             for( j=0; j<q; ++j ){
-                wppw[i][j][k+1] = wppw[i][j][k+1-1] + wpw[i][k][k+1-1]*wpw[j][k][k+1-1]*wppw[k][k][k+1-1]/pow(wpw[k][k][k+1-1],2)-
+                wppw[i][j][k+1] = wppw[i][j][k+1-1] + wpw[i][k][k+1-1]*wpw[j][k][k+1-1]*
+                                  wppw[k][k][k+1-1]/pow(wpw[k][k][k+1-1],2)-
                                   wpw[i][k][k+1-1]*wppw[j][k][k+1-1]/wpw[k][k][k+1-1]-
                                   wpw[j][k][k+1-1]*wppw[i][k][k+1-1]/wpw[k][k][k+1-1];
             }
@@ -173,7 +178,8 @@ void _get_yTPxPxy_(const int & n, const My_Vector<double> & y, const My_matrix<d
     }
     for( k=0; k < q; ++k ){
         for( j=0; j<q; ++j ){
-            yppw.get_matrix()[j][k+1] = yppw.get_matrix()[j][k+1-1] + ypw.get_matrix()[k][k+1-1]*wpw[j][k][k+1-1]*wppw[k][k][k+1-1]/pow(wpw[k][k][k+1-1],2)-
+            yppw.get_matrix()[j][k+1] = yppw.get_matrix()[j][k+1-1] + ypw.get_matrix()[k][k+1-1]*wpw[j][k][k+1-1]*
+                                        wppw[k][k][k+1-1]/pow(wpw[k][k][k+1-1],2)-
                                         ypw.get_matrix()[k][k+1-1]*wppw[j][k][k+1-1]/wpw[k][k][k+1-1]-
                                         wpw[j][k][k+1-1]*yppw.get_matrix()[k][k+1-1]/wpw[k][k][k+1-1];
         }
@@ -184,14 +190,16 @@ void _get_yTPxPxy_(const int & n, const My_Vector<double> & y, const My_matrix<d
         yTPxPxy += Uty.get_array()[j] *  Uty.get_array()[j] / pow(lambda_theta_p_1.get_array()[j], 2);
     }
     for(  k=0; k < q; ++k ){
-        yTPxPxy = yTPxPxy + ypw.get_matrix()[k][k+1-1]*ypw.get_matrix()[k][k+1-1]*wppw[k][k][k+1-1]/pow((wpw[k][k][k+1-1]), 2) -
+        yTPxPxy = yTPxPxy + ypw.get_matrix()[k][k+1-1]*ypw.get_matrix()[k][k+1-1]*
+                  wppw[k][k][k+1-1]/pow((wpw[k][k][k+1-1]), 2) -
                   2*(ypw.get_matrix()[k][k+1-1]*yppw.get_matrix()[k][k+1-1]/wpw[k][k][k+1-1]);
     }
     //for aTPiPib end
 }
 
 void _get_yTPxPxPxy_(const int & n, const My_Vector<double> & y, const My_matrix<double> & UtW,
-                 const My_Vector<double> & Uty, const Eigen_result & eigen_L, const double & lambda, const int & q, const My_Vector<double> & lambda_theta_p_1,
+                 const My_Vector<double> & Uty, const Eigen_result & eigen_L, const double & lambda,
+                     const int & q, const My_Vector<double> & lambda_theta_p_1,
                  double & yTPxPxPxy, const My_matrix<double> & ypw, const My_matrix<double> & yppw,
                  My_matrix<double> & ypppw, double *** wpw, double *** wppw, double *** wpppw) {
     yTPxPxPxy=0.0;
@@ -213,7 +221,8 @@ void _get_yTPxPxPxy_(const int & n, const My_Vector<double> & y, const My_matrix
     for( k=0; k < q; ++k ){
         for( i=0; i<q; ++i ){
             for( j=0; j<q; ++j ){
-                wpppw[i][j][k+1] = wpppw[i][j][k+1-1] - wpw[i][k][k+1-1]*wpw[j][k][k+1-1]*pow(wppw[k][k][k+1-1],2)/pow(wpw[k][k][k+1-1],3)-
+                wpppw[i][j][k+1] = wpppw[i][j][k+1-1] - wpw[i][k][k+1-1]*wpw[j][k][k+1-1]*
+                                   pow(wppw[k][k][k+1-1],2)/pow(wpw[k][k][k+1-1],3)-
                                    wpw[i][k][k+1-1]*wpppw[j][k][k+1-1]/wpw[k][k][k+1-1]-
                                    wpw[j][k][k+1-1]*wpppw[i][k][k+1-1]/wpw[k][k][k+1-1]-
                                    wppw[i][k][k+1-1]*wppw[j][k][k+1-1]/wpw[k][k][k+1-1]+
@@ -236,7 +245,8 @@ void _get_yTPxPxPxy_(const int & n, const My_Vector<double> & y, const My_matrix
     }
     for( k=0; k < q; ++k ){
         for( j=0; j<q; ++j ){
-            ypppw.get_matrix()[j][k+1] = ypppw.get_matrix()[j][k+1-1] - ypw.get_matrix()[k][k+1-1]*wpw[j][k][k+1-1]*pow(wppw[k][k][k+1-1], 2)/pow(wpw[k][k][k+1-1], 3)-
+            ypppw.get_matrix()[j][k+1] = ypppw.get_matrix()[j][k+1-1] - ypw.get_matrix()[k][k+1-1]*wpw[j][k][k+1-1]
+                                         *pow(wppw[k][k][k+1-1], 2)/pow(wpw[k][k][k+1-1], 3)-
                                          ypw.get_matrix()[k][k+1-1]*wpppw[j][k][k+1-1]/wpw[k][k][k+1-1]-
                                          wpw[j][k][k+1-1]*ypppw.get_matrix()[k][k+1-1]/wpw[k][k][k+1-1]-
                                          yppw.get_matrix()[k][k+1-1]*wppw[j][k][k+1-1]/wpw[k][k][k+1-1]+
@@ -297,8 +307,9 @@ double _get_trace_H_1_G_H_1_G_(const double & lambda, const int & n, const doubl
     return (n+trace_H_1_H_1-2.0*trace_H_1)/pow(lambda, 2);
 }
 
-void _get_trace_Px_s_( const double & trace_H_1, const double & trace_H_1_H_1, const My_Vector<double> & lambda_theta_p_1, const My_matrix<double> & UtW,
-                       const int & n, const int & q, double *** wpw, double *** wppw, double *** wpppw, double & trace_P, double & trace_PP){
+void _get_trace_Px_s_( const double & trace_H_1, const double & trace_H_1_H_1, const My_Vector<double> & lambda_theta_p_1,
+                       const My_matrix<double> & UtW, const int & n, const int & q,
+                       double *** wpw, double *** wppw, double *** wpppw, double & trace_P, double & trace_PP){
     int k=0;
     trace_P  = trace_H_1 -     wppw[k][k][k+1-1]/wpw[k][k][k+1-1];
     trace_PP = trace_H_1_H_1 + pow(wppw[k][k][k+1-1], 2)/pow(wpw[k][k][k+1-1], 2)-2*wpppw[k][k][k+1-1]/wpw[k][k][k+1-1];
@@ -369,21 +380,25 @@ double _dsrll_(const double & trace_Px_G, const int & p, const double & ytPxGPxy
 }
 
 // (eq. 6 from gemma paper)
-double _ddsll_( const double & trace_H_1_G_H_1_G, const int & n, const double & yTPxGPxGPxy, const double & ytPxy, const double & ytPxGPxy ){
+double _ddsll_( const double & trace_H_1_G_H_1_G, const int & n, const double & yTPxGPxGPxy, const double & ytPxy,
+                const double & ytPxGPxy ){
     return 0.5*trace_H_1_G_H_1_G-0.5*n*(2*yTPxGPxGPxy*ytPxy-pow(ytPxGPxy,2))/pow(ytPxy, 2);
 }
 
 // (eq. 8 from gemma paper)
-double _ddsrll_(const double & trace_Px_G_Px_G, const int & p, const double & yTPxGPxGPxy, const double & ytPxy, const double & ytPxGPxy){
+double _ddsrll_(const double & trace_Px_G_Px_G, const int & p, const double & yTPxGPxGPxy, const double & ytPxy,
+                const double & ytPxGPxy){
     return 0.5*trace_Px_G_Px_G - 0.5*p*(2*yTPxGPxGPxy*ytPxy-pow(ytPxGPxy, 2)) / pow(ytPxy,2);
 }
 
 // this is an implementation of the euqation 2.6 from publication:
 //Generalized Newton Raphson’s method free from second derivative, Journal of Nonlinear Science and Applications 9(5):2823-2831 · April 2016 DOI: 10.22436/jnsa.009.05.77
 // however this is not the original publication, so do not cite this paper for publication purpose
-int newton_raphson_ll( double & new_lambda, const double & eps, const int & js, const int & n, const int & q, const Eigen_result & eigen_L,
+int newton_raphson_ll( double & new_lambda, const double & eps, const int & js, const int & n, const int & q,
+                       const Eigen_result & eigen_L,
                        const My_Vector<double> & y, const My_matrix<double> & UtW, const My_Vector<double> & Uty,
-                       double *** wpw, double *** wppw, double *** wpppw, My_matrix<double> & ypw, My_matrix<double> & yppw, My_matrix<double> & ypppw ){ // js maximum number of iteration
+                       double *** wpw, double *** wppw, double *** wpppw, My_matrix<double> & ypw,
+                       My_matrix<double> & yppw, My_matrix<double> & ypppw ){ // js maximum number of iteration
     int k=1, l=js;
     double y0, y1, y2, d, u, x0=new_lambda, x1=new_lambda;
 
@@ -447,8 +462,10 @@ int newton_raphson_ll( double & new_lambda, const double & eps, const int & js, 
 
 int newton_raphson_reml( double & new_lambda, const double & eps, const int & js, const int & n, const Eigen_result & eigen_L,
                          const My_Vector<double> & y,
-                         const int & q, const int & p, double *** wpw, double *** wppw, double *** wpppw, const My_matrix<double> & UtW,
-                         const My_Vector<double> & Uty, My_matrix<double> & ypw, My_matrix<double> & yppw, My_matrix<double> & ypppw){ // js maximum number of iteration
+                         const int & q, const int & p, double *** wpw, double *** wppw, double *** wpppw,
+                         const My_matrix<double> & UtW,
+                         const My_Vector<double> & Uty, My_matrix<double> & ypw, My_matrix<double> & yppw,
+                         My_matrix<double> & ypppw){ // js maximum number of iteration
     int k=1,l=js;
     double y1, y2, d,  x0, x1=new_lambda, u;
     x0=new_lambda;

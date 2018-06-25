@@ -38,14 +38,16 @@ double EigenProc(const My_matrix<double> & V_g, const My_matrix<double> & V_e, c
         //gsl_blas_dsyr(CblasUpper, d, &U_col.vector, V_e_hi);
         for ( j = 0; j < d_size; ++j) {
             for( k = 0; k < d_size; ++k ){
-                V_e_h.get_matrix()[j][k] += eigen_l.get_eigen_vectors().get_matrix()[i][j]*eigen_l.get_eigen_vectors().get_matrix()[i][k]*d;
+                V_e_h.get_matrix()[j][k] += eigen_l.get_eigen_vectors().get_matrix()[i][j]*
+                                            eigen_l.get_eigen_vectors().get_matrix()[i][k]*d;
             }
             // since my function return U^t, So the index should be adapted
         }
 //        d = 1.0/d;
         for ( j = 0; j < d_size; ++j) {
             for( k = 0; k < d_size; ++k ){
-                V_e_hi.get_matrix()[j][k] += eigen_l.get_eigen_vectors().get_matrix()[i][j]*eigen_l.get_eigen_vectors().get_matrix()[i][k]/d;
+                V_e_hi.get_matrix()[j][k] += eigen_l.get_eigen_vectors().get_matrix()[i][j]*
+                                             eigen_l.get_eigen_vectors().get_matrix()[i][k]/d;
             }
             // since my function return U^t, So the index should be adapted
         }
@@ -3309,7 +3311,9 @@ void AnalyzePlink(const Eigen_result & eigen_r, const My_matrix<double> & UtW, c
                 c++;
             }
         }
-        std::cout << genotype.get_variant_Vector()[t].getChromosome() << " " << genotype.get_variant_Vector()[t].getPosition() << " " << genotype.get_variant_Vector()[t].getId() << "  " << p_lrt << std::endl;
+        std::cout << genotype.get_variant_Vector()[t].getChromosome() << " " <<
+                  genotype.get_variant_Vector()[t].getPosition() << " " << genotype.get_variant_Vector()[t].getId()
+                  << "  " << p_lrt << std::endl;
     }
 }
 
