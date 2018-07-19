@@ -17,8 +17,11 @@
 
 void AnalyzePlink(const Eigen_result & eigen_r, const My_matrix<double> & UtW, const My_matrix<double> & UtY,
                   const char & method, Kinship_matrix_impl & k_i,
-                  Genotype & genotype, const My_matrix<double> & phenotype);
+                  Genotype & genotype, const My_matrix<double> & phenotype, const double & man_l, const double & man_u);
 
+void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<double> & UtW, const My_matrix<double> & UtY,
+                            const char & method, Kinship_matrix_impl & k_i,
+                            Genotype & genotype, const My_matrix<double> & phenotype, const double & man_l, const double & man_u );
 
 
 #endif //MLMM_CPP_MT_GEMMA_IMPL_H

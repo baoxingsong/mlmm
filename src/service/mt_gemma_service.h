@@ -11,4 +11,6 @@
 
 void mt_gemma_test ( const std::string & phenotype_path, const std::string & genotype_path,
                      const std::string & kinship_file, const double & maf);
+void mt_gemma_test_MultiAllic ( const std::string & phenotype_path, const std::string & genotype_path,
+                                const std::string & kinship_file, const double & maf);
 #endif //MLMM_CPP_MT_GEMMA_SERVICE_H
