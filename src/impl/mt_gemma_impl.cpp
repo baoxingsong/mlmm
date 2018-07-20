@@ -414,14 +414,6 @@ double MphEM(const char func_name, const size_t & max_iter, const double & max_p
     trmul(X, Xt, XXt);
     My_matrix<double> XXti(XXt);
     inverse_matrix(XXti);
-//    std::cout << "line 415" << std::endl;
-//
-//    for( int i=0; i<c_size; ++i ){
-//        for( int j=0; j<c_size; ++j ){
-//            std::cout << "i " << i << " j " << j << " XXt " << XXt.get_matrix()[i][j] << std::endl;
-//            std::cout << "i " << i << " j " << j << " XXti " << XXti.get_matrix()[i][j] << std::endl;
-//        }
-//    }
 
     // Calculate the constant for logl.
     if (func_name == 'R' || func_name == 'r') {
@@ -431,47 +423,25 @@ double MphEM(const char func_name, const size_t & max_iter, const double & max_p
     } else {
         logl_const = -0.5 * (double)n_size * (double)d_size * log(2.0 * M_PI);
     }
-//    std::cout << "logl_const " << logl_const << std::endl;
+//    std::cout << "line 426" << std::endl;
     // Start EM.
     for (size_t t = 0; t < max_iter; ++t) {
-//        std::cout << " max_iter " << max_iter << " max_prec " << max_prec << " t " << t << std::endl;
         logdet_Ve = EigenProc( V_g, V_e, d_size, D_l, UltVeh, UltVehi);
-//        std::cout << "line 428 logdet_Ve: " << logdet_Ve << std::endl;
-//        for( int song_t=0; song_t<D_l.get_length(); ++song_t ){
-//            std::cout << "line 446 D_l: " << D_l.get_array()[song_t] << std::endl;
-//        }
-//        std::cout << "line 441" << std::endl;
         logdet_Q = CalcQi(eigen_r, D_l, n_size, d_size, c_size, X, Qi);
-//        std::cout << "line 430 logdet_Q: " << logdet_Q << std::endl;
         trmul(UltVehi, Y, UltVehiY);
         CalcXHiY( eigen_r, D_l, X, UltVehiY, n_size, d_size, c_size, xHiy);
-//        std::cout << "line 446" << std::endl;
-        // Calculate log likelihood/restricted likelihood value, and
-        // terminate if change is small.
         double temp_value = MphCalcLogL( eigen_r, xHiy, n_size, d_size, c_size, dc_size, D_l, UltVehiY, Qi);
-//        std::cout << "line 446 temp_value: " << temp_value << std::endl;
         logl_new = logl_const + temp_value -
                    0.5 * (double)n_size * logdet_Ve;
-//        std::cout << "line 444 logl_new: " << logl_new << std::endl;
         if (func_name == 'R' || func_name == 'r') {
             logl_new += -0.5 * (logdet_Q - (double)c_size * logdet_Ve);
         }
-//        std::cout << "line 457" << std::endl;
         if (t != 0 && fabs(logl_new - logl_old) < max_prec) {
             break;
         }
         logl_old = logl_new;
-//        std::cout << "line 462" << std::endl;
         CalcOmega( eigen_r,  D_l,  n_size,  d_size, OmegaU, OmegaE);
-//        std::cout << "line 464" << std::endl;
-//        std::cout << " logl_new " << logl_new << std::endl;
-        /*
-        for( int ti=0; ti<d_size; ++ti ){
-            for( int tj=0; tj<n_size; ++tj ){
-                std::cout << "ti " << ti << " tj " << tj << " OmegaU " << OmegaU.get_matrix()[ti][tj] << std::endl;
-                std::cout << "ti " << ti << " tj " << tj << " OmegaE " << OmegaE.get_matrix()[ti][tj] << std::endl;
-            }
-        }*/
+
         // Update UltVehiB, UltVehiU.
         if (func_name == 'R' || func_name == 'r') {
             UpdateRL_B( xHiy, Qi, n_size, d_size, c_size, dc_size, UltVehiB);
@@ -480,55 +450,13 @@ double MphEM(const char func_name, const size_t & max_iter, const double & max_p
             trmul(UltVehi, B, UltVehiB);
             trmul(UltVehiB, X, UltVehiBX);
         }
-//        std::cout << "line 480" << std::endl;
-///*
-//        for( int ti=0; ti<d_size; ++ti ){
-//            for( int tj=0; tj<n_size; ++tj ){
-//                std::cout << "ti " << ti << " tj " << tj << " UltVehiBX " << UltVehiBX.get_matrix()[ti][tj] << std::endl;
-//                std::cout << "ti " << ti << " tj " << tj << " OmegaE " << OmegaE.get_matrix()[ti][tj] << std::endl;
-//                std::cout << "ti " << ti << " tj " << tj << " UltVehiY " << UltVehiY.get_matrix()[ti][tj] << std::endl;
-//            }
-//        }
-//*/
         UpdateU(OmegaE, UltVehiY, n_size, d_size, UltVehiBX, UltVehiU);
-//        std::cout << "line 492" << std::endl;
-        //        for( int ti=0; ti<d_size; ++ti ){
-//            for( int tj=0; tj<n_size; ++tj ){
-////                std::cout << "ti " << ti << " tj " << tj << " UltVehiBX " << UltVehiBX.get_matrix()[ti][tj] << std::endl;
-////                std::cout << "ti " << ti << " tj " << tj << " OmegaE " << OmegaE.get_matrix()[ti][tj] << std::endl;
-////                std::cout << "ti " << ti << " tj " << tj << " UltVehiY " << UltVehiY.get_matrix()[ti][tj] << std::endl;
-////                std::cout << "ti " << ti << " tj " << tj << " UltVehiU " << UltVehiU.get_matrix()[ti][tj] << std::endl;
-//            }
-//        }
-
-//
-//        for( int ti=0; ti<d_size; ++ti ){
-//            for( int tj=0; tj<n_size; ++tj ){
-//              std::cout << "ti " << ti << " tj " << tj << " UltVehiU " << UltVehiU.get_matrix()[ti][tj] << std::endl;
-//            }
-//        }
-
         if (func_name == 'L' || func_name == 'l') {
-            // UltVehiBX is destroyed here.
             UpdateL_B(X, XXti, n_size,  d_size,  c_size, UltVehiY, UltVehiU, UltVehiBX, UltVehiB);
-//            std::cout << "line 512" << std::endl;
+//            std::cout << "line 456" << std::endl;
             trmul(UltVehiB, X,UltVehiBX);
         }
-/*
-        for( int ti=0; ti<d_size; ++ti ){
-            for( int tj=0; tj<n_size; ++tj ){
-                std::cout << "ti " << ti << " tj " << tj << " UltVehiBX " << UltVehiBX.get_matrix()[ti][tj] << std::endl;
-            }
-        }
-*/
-//        std::cout << "line 521" << std::endl;
         UpdateE(UltVehiY, UltVehiBX, n_size, d_size, UltVehiU, UltVehiE);
-
-//        for( int ti=0; ti<d_size; ++ti ){
-//            for( int tj=0; tj<n_size; ++tj ){
-//                std::cout << "ti " << ti << " tj " << tj << " UltVehiE " << UltVehiE.get_matrix()[ti][tj] << std::endl;
-//            }
-//        }
 
         // Calculate U_hat, E_hat and B.
         My_matrix<double> UltVeh_t(UltVeh.get_num_column(), UltVeh.get_num_row());
@@ -540,32 +468,10 @@ double MphEM(const char func_name, const size_t & max_iter, const double & max_p
         // Calculate Sigma_uu and Sigma_ee.
         CalcSigma(func_name, eigen_r, n_size, d_size, c_size, dc_size, D_l, X,  OmegaU, OmegaE,
                   UltVeh, Qi, Sigma_uu, Sigma_ee);
-/*
-        for( int i_t=0; i_t<d_size; ++i_t ){
-            for( int j_t=0; j_t<d_size; ++j_t ){
-                std::cout << " i_t " << i_t << " j_t " << j_t << " Sigma_uu " << Sigma_uu.get_matrix()[i_t][j_t] << std::endl;
-                std::cout << " i_t " << i_t << " j_t " << j_t << " Sigma_ee " << Sigma_ee.get_matrix()[i_t][j_t] << std::endl;
-            }
-        }
-*/
         // Update V_g and V_e.
-//        std::cout << "line 548" << std::endl;
+//        std::cout << "line 472" << std::endl;
         UpdateV( eigen_r, U_hat, E_hat,  n_size,  d_size, c_size, Sigma_uu, Sigma_ee, V_g, V_e);
-/*
-        for( int i_t=0; i_t<d_size; ++i_t ){
-            for( int j_t=0; j_t<d_size; ++j_t ){
-                std::cout << " i_t " << i_t << " j_t " << j_t << " V_g " << V_g.get_matrix()[i_t][j_t] << std::endl;
-                std::cout << " i_t " << i_t << " j_t " << j_t << " V_e " << V_e.get_matrix()[i_t][j_t] << std::endl;
-            }
-        }
-        */
-//
-//        for( int i_t=0; i_t<d_size; ++i_t ){
-//            for( int j_t=0; j_t<n_size; ++j_t ){
-//                std::cout << " i_t " << i_t << " j_t " << j_t << " E_hat " << E_hat.get_matrix()[i_t][j_t] << std::endl;
-//            }
-//        }
-
+//        std::cout << "line 474" << std::endl;
     }
     return logl_new;
 }
@@ -3307,7 +3213,7 @@ void AnalyzePlink(const Eigen_result & eigen_r, const My_matrix<double> & UtW, c
             }
             std::cout << genotype.get_variant_Vector()[t].getChromosome() << " " <<
                       genotype.get_variant_Vector()[t].getPosition() << " " << genotype.get_variant_Vector()[t].getId()
-                      << "  " << p_lrt << std::endl;
+                      << "  " << p_lrt << " " << logl_H0 << " " << logl_H1 << std::endl;
         }
     }
 }
@@ -3448,7 +3354,7 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
 //    My_matrix<double> X(c_size + 1, n_size);
     My_matrix<double> V_g(d_size, d_size);
     My_matrix<double> V_e(d_size, d_size);
-    My_matrix<double> B(d_size, c_size + 1);
+    //My_matrix<double> B(d_size, c_size + 1);
     My_Vector<double> beta(d_size);
     My_matrix<double> Vbeta(d_size, d_size);
 
@@ -3461,15 +3367,10 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
     size_t ti;
     size_t ii;
     My_matrix<double> X_sub(c_size, n_size);
-    My_matrix<double> B_sub(d_size, c_size);
+//    My_matrix<double> B_sub(d_size, c_size);
     My_matrix<double> xHi_all_sub(d_size * c_size, d_size * n_size);
 
-    for( i=0; i<d_size; ++i ){
-        for( j=0; j<c_size; ++j ) {
-            B_sub.get_matrix()[i][j]=B.get_matrix()[i][j];
-        }
-    }
-    for( i=0; i<d_size * c_size; ++i ){
+     for( i=0; i<d_size * c_size; ++i ){
         for( j=0; j<d_size * n_size; ++j ){
             xHi_all_sub.get_matrix()[i][j] = xHi_all.get_matrix()[i][j];
         }
@@ -3477,16 +3378,16 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
     T_matrix(UtY, Y);
     T_matrix(UtW, X_sub);
 
-    for( i=0; i<B.get_num_row(); ++i ){
-        B.get_matrix()[i][c_size]=0.0;
+    for( i=0; i<B_null.get_num_row(); ++i ){
+        B_null.get_matrix()[i][c_size]=0.0;
     }
 
     MphInitial( em_iter, em_prec, nr_iter, nr_prec, n_size, d_size, c_size, eigen_r, UtW,
-                Y, l_min, l_max, eps, maxiter, "ML", n_region, k_i, V_g, V_e, B, phenotype);  // have been well tested
+                Y, l_min, l_max, eps, maxiter, "ML", n_region, k_i, V_g, V_e, B_null, phenotype);  // have been well tested
 
     logl_H0 = MphEM('R', em_iter, em_prec, eigen_r, X_sub, Y, n_size, d_size, c_size, U_hat, E_hat,
                     OmegaU, OmegaE, UltVehiY, UltVehiBX, UltVehiU, UltVehiE, V_g,
-                    V_e, B);
+                    V_e, B_null);
 
     logl_H0 = MphNR('R', nr_iter, nr_prec, eigen_r, X_sub, Y, n_size, d_size, c_size, Hi_all,
                     xHi_all_sub, Hiy_all, V_g, V_e, Hessian, crt_a, crt_b,
@@ -3497,7 +3398,7 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
             xHi_all.get_matrix()[i][j] = xHi_all_sub.get_matrix()[i][j];
         }
     }
-    MphCalcBeta(eigen_r, X_sub, n_size, d_size, c_size, Y, V_g, V_e, UltVehiY, B,
+    MphCalcBeta(eigen_r, X_sub, n_size, d_size, c_size, Y, V_g, V_e, UltVehiY, B_null,
                 se_B_null);
     c = 0;
     std::vector<double> Vg_remle_null, Ve_remle_null, Vg_mle_null, Ve_mle_null;
@@ -3521,7 +3422,7 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
     se_beta_remle_null.clear();
     for ( i = 0; i < se_B_null.get_num_row(); ++i) {
         for ( j = 0; j < se_B_null.get_num_column(); ++j) {
-            beta_remle_null.push_back(B.get_matrix()[i][j]);
+            beta_remle_null.push_back(B_null.get_matrix()[i][j]);
             se_beta_remle_null.push_back(se_B_null.get_matrix()[i][j]);
         }
     }
@@ -3563,7 +3464,7 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
 
     logl_H0 = MphEM('L', em_iter, em_prec, eigen_r, X_sub, Y, n_size, d_size, c_size, U_hat, E_hat,
                     OmegaU, OmegaE, UltVehiY, UltVehiBX, UltVehiU, UltVehiE, V_g,
-                    V_e, B);
+                    V_e, B_null);
     logl_H0 = MphNR('L', nr_iter, nr_prec, eigen_r, X_sub, Y, n_size, d_size, c_size, Hi_all,
                     xHi_all_sub, Hiy_all, V_g, V_e, Hessian, crt_a, crt_b,
                     crt_c);
@@ -3573,7 +3474,7 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
         }
     }
 
-    MphCalcBeta(eigen_r, X_sub, n_size, d_size, c_size, Y, V_g, V_e, UltVehiY, B,
+    MphCalcBeta(eigen_r, X_sub, n_size, d_size, c_size, Y, V_g, V_e, UltVehiY, B_null,
                 se_B_null);
 
     c = 0;
@@ -3592,7 +3493,7 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
     se_beta_mle_null.clear();
     for ( i = 0; i < se_B_null.get_num_row(); ++i) {
         for ( j = 0; j < se_B_null.get_num_column(); ++j) {
-            beta_mle_null.push_back(B.get_matrix()[i][j]);
+            beta_mle_null.push_back(B_null.get_matrix()[i][j]);
             se_beta_mle_null.push_back(se_B_null.get_matrix()[i][j]);
         }
     }
@@ -3643,17 +3544,11 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
     }
     V_g_null.value_copy(V_g);
     V_e_null.value_copy(V_e);
-    B_null.value_copy(B);
+//    B_null.value_copy(B);
     //return;
     // Start reading genotypes and analyze.
     // Calculate n_bit and c, the number of bit for each snp.
 
-    double sum;
-    double count;
-    double mean;
-    bool has_missing;
-    std::vector <int> indexs;
-    size_t i_index;
     int size, p, q;
     int j_1;
     double this_this_state;
@@ -3670,7 +3565,6 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
                             allThisStates[genotype.get_genotype_matrix().get_matrix()[i][t]] + 1;
                 }
             }
-
             std::vector<int> allThisStates_vector;
             for (std::map<int, int>::iterator ittt = allThisStates.begin(); ittt != allThisStates.end(); ++ittt) {
                 if (ittt->second >= man_l && ittt->second <= man_u && ittt->second != missing_genotype) {
@@ -3682,10 +3576,11 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
                 q = c_size + size - 1; // here minute 1 is because we do not take all the allele as covariants
                 p = n_size - q;
 
-                My_matrix<double> full_x(n_size, size-1);
-                for (i = 0; i < n_size; ++i) {
-                    full_x.get_matrix()[i][0] = 1;
-                }
+                My_matrix<double> x(n_size, size-1);
+                My_matrix<double> X_row(n_size, q );
+                My_matrix<double> X(q, n_size);
+                My_matrix<double> B(d_size, q);
+
                 for (i = 0; i < n_size; ++i) {
                     for (j_1 = 0; j_1 < (size - 1); ++j_1) { // left one allele
                         if (allThisStates_vector[j_1] == genotype.get_genotype_matrix().get_matrix()[i][j]) {
@@ -3693,35 +3588,28 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
                         } else {
                             this_this_state = 0.0;
                         }
-                        full_x.get_matrix()[i][j_1 + 1] = this_this_state;
+                        x.get_matrix()[i][j_1] = this_this_state;
                     }
                 }
-
-                My_matrix<double> X(n_size, q);
-
+                trmul(eigen_r.get_eigen_vectors(), x, X_row);
                 // Initial values.
                 V_g.value_copy(V_g_null);
                 V_e.value_copy(V_e_null);
-                B.value_copy(B_null);
-                X.set_values_zero();
-//                My_Vector<double> X_row(X.get_num_column());
-                for( int s1=0; s1<n_size; ++s1 ){
-                    for( int s2=0; s2<full_x.get_num_column(); ++s2 ){
-                        for( int s3=0; s3<n_size; ++s3 ){
-                            X.get_matrix()[s1][s2] += eigen_r.get_eigen_vectors().get_matrix()[s1][s3] * full_x.get_matrix()[s2][s2];
-                        }
-                    }
-                }
-                for( int s1=0; s1<n_size; ++s1 ){
-                    for( int s2=0; s2<UtW.get_num_column(); ++s2 ){
-                        X.get_matrix()[s1][full_x.get_num_column()+s2]=UtW.get_matrix()[s1][s2];
+
+                for( int s1=0; s1<c_size; ++s1 ){
+                    for( int s2=0; s2<n_size; ++s2 ){
+                        X.get_matrix()[s1][s2] = UtW.get_matrix()[s2][s1];
                     }
                 }
 
-                logl_H1 = MphEM('L', em_iter / 10, em_prec * 10, eigen_r, X, Y, n_size, d_size, c_size + 1,
+                for( int s1=0; s1<(size-1); ++s1 ){
+                    for( int s2=0; s2<n_size; ++s2 ){
+                        X.get_matrix()[s1+c_size][s2] = X_row.get_matrix()[s2][s1];
+                    }
+                }
+                logl_H1 = MphEM('L', em_iter / 10, em_prec * 10, eigen_r, X, Y, n_size, d_size, q,
                                 U_hat, E_hat, OmegaU, OmegaE, UltVehiY, UltVehiBX, UltVehiU,
                                 UltVehiE, V_g, V_e, B);
-
 
                 p_lrt = 1 - chii(2.0 * (logl_H1 - logl_H0), d_size);
                 if (p_lrt < p_nr) {
@@ -3759,7 +3647,7 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
                 }
                 std::cout << genotype.get_variant_Vector()[t].getChromosome() << " " <<
                           genotype.get_variant_Vector()[t].getPosition() << " " << genotype.get_variant_Vector()[t].getId()
-                          << "  " << p_lrt << std::endl;
+                          << "  " << p_lrt << " " << logl_H0 << " " << logl_H1 << std::endl;
             }
         }
     }
