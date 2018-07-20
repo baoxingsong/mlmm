@@ -2882,8 +2882,6 @@ void AnalyzePlink(const Eigen_result & eigen_r, const My_matrix<double> & UtW, c
     size_t n_size = UtY.get_num_row(), d_size = UtY.get_num_column(), c_size = UtW.get_num_column();
     size_t dc_size = d_size * (c_size + 1), v_size = d_size * (d_size + 1) / 2;
 
-    My_matrix<double> Xlarge(n_size, 20000);
-    Xlarge.set_values_zero();
 
     // Large matrices for EM.
     My_matrix<double> U_hat(d_size, n_size);
@@ -3153,6 +3151,7 @@ void AnalyzePlink(const Eigen_result & eigen_r, const My_matrix<double> & UtW, c
         }
         if( number_1>= man_l && number_1<=man_u) {
             if(has_missing){
+                std::cout <<  "has missing" << std::endl;
                 mean=sum/count;
                 for( i_index=0;i_index<indexs.size();++i_index){
                     x.get_array()[indexs[i_index]] = mean;
@@ -3173,9 +3172,6 @@ void AnalyzePlink(const Eigen_result & eigen_r, const My_matrix<double> & UtW, c
                             U_hat, E_hat, OmegaU, OmegaE, UltVehiY, UltVehiBX, UltVehiU,
                             UltVehiE, V_g, V_e, B);
 
-//            p_lrt = MphCalcP(eigen_r, X_row, n_size, d_size, c_size, X_sub, Y, V_g, V_e,
-//                             UltVehiY, beta, Vbeta);
-
             p_lrt = 1 - chii(2.0 * (logl_H1 - logl_H0), d_size);
             if (p_lrt < p_nr) {
                 logl_H1 = MphNR('L', nr_iter / 10, nr_prec * 10, eigen_r, X, Y, n_size, d_size, c_size + 1,
@@ -3188,10 +3184,7 @@ void AnalyzePlink(const Eigen_result & eigen_r, const My_matrix<double> & UtW, c
                 }
                 // Calculate beta and Vbeta.
 
-//                p_lrt = MphCalcP(eigen_r, X_row, n_size, d_size, dc_size,
-//                                 X, Y, V_g, V_e, UltVehiY, beta, Vbeta);
                 p_lrt = 1 - chii(2.0 * (logl_H1 - logl_H0), d_size);
-                //p_lrt = gsl_cdf_chisq_Q(2.0 * (logl_H1 - logl_H0), (double)d_size);
                 if (crt == 1) {
                     p_lrt = PCRT(d_size, p_lrt, crt_a, crt_b, crt_c);
                 }
@@ -3325,9 +3318,6 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
     size_t c = 0;
     size_t n_size = UtY.get_num_row(), d_size = UtY.get_num_column(), c_size = UtW.get_num_column();
     size_t dc_size = d_size * (c_size + 1), v_size = d_size * (d_size + 1) / 2;
-
-    My_matrix<double> Xlarge(n_size, 20000);
-    Xlarge.set_values_zero();
 
     // Large matrices for EM.
     My_matrix<double> U_hat(d_size, n_size);
@@ -3514,7 +3504,6 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
         }
         std::cout << std::endl;
     }
-
     std::cout << "MLE estimate for Ve in the null model: " << std::endl;
     for ( i = 0; i < d_size; ++i) {
         for ( j = 0; j <= i; ++j) {
@@ -3584,7 +3573,7 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
 
                 for (i = 0; i < n_size; ++i) {
                     for (j_1 = 0; j_1 < (size - 1); ++j_1) { // left one allele
-                        if (allThisStates_vector[j_1] == genotype.get_genotype_matrix().get_matrix()[i][j]) {
+                        if (allThisStates_vector[j_1] == genotype.get_genotype_matrix().get_matrix()[i][t]) {
                             this_this_state = 1.0;
                         } else {
                             this_this_state = 0.0;
@@ -3612,7 +3601,7 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
                                 U_hat, E_hat, OmegaU, OmegaE, UltVehiY, UltVehiBX, UltVehiU,
                                 UltVehiE, V_g, V_e, B);
 
-                p_lrt = 1 - chii(2.0 * (logl_H1 - logl_H0), d_size);
+                p_lrt = 1 - chii(2.0 * (logl_H1 - logl_H0), d_size*(size-1));//todo rethink about this part
                 if (p_lrt < p_nr) {
                     logl_H1 = MphNR('L', nr_iter / 10, nr_prec * 10, eigen_r, X, Y, n_size, d_size, c_size + 1,
                                     Hi_all, xHi_all, Hiy_all, V_g, V_e, Hessian, crt_a, crt_b, crt_c);
@@ -3624,11 +3613,10 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
                     }
                     // Calculate beta and Vbeta.
 
-
-                    p_lrt = 1 - chii(2.0 * (logl_H1 - logl_H0), d_size);
+                    p_lrt = 1 - chii(2.0 * (logl_H1 - logl_H0), d_size*(size-1)); //todo rethink about this part
                     //p_lrt = gsl_cdf_chisq_Q(2.0 * (logl_H1 - logl_H0), (double)d_size);
                     if (crt == 1) {
-                        p_lrt = PCRT(d_size, p_lrt, crt_a, crt_b, crt_c);
+                        p_lrt = PCRT(d_size*(size-1), p_lrt, crt_a, crt_b, crt_c);
                     }
                 }
 
