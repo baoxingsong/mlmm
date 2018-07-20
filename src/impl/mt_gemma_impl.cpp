@@ -3514,6 +3514,7 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
         }
         std::cout << std::endl;
     }
+
     std::cout << "MLE estimate for Ve in the null model: " << std::endl;
     for ( i = 0; i < d_size; ++i) {
         for ( j = 0; j <= i; ++j) {
