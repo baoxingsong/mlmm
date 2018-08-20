@@ -6,4 +6,5 @@
 #define MLMM_CPP_SERVICE_H
 #include "./emmax_service.h"
 #include "./gemma_service.h"
+#include "./mt_gemma_service.h"
 #endif //MLMM_CPP_SERVICE_H

@@ -1976,12 +1976,13 @@ void CalcCRT(const My_matrix<double> & Hessian_inv, const My_matrix<double> & Qi
              const My_matrix<double> & xHiDHiDHix_all_gg,
              const My_matrix<double> & xHiDHiDHix_all_ee,
              const My_matrix<double> & xHiDHiDHix_all_ge,
-             const size_t & d_size, const size_t & c_size, const size_t & dc_size,
+             const size_t & d_size,
              double &crt_a, double &crt_b, double &crt_c) {
     crt_a = 0.0;
     crt_b = 0.0;
     crt_c = 0.0;
-
+    size_t dc_size = Qi.get_num_row();
+    size_t c_size = dc_size/d_size;
     size_t v_size = Hessian_inv.get_num_row() / 2;
     double h_gg, h_ge, h_ee, d, B = 0.0, C = 0.0, D = 0.0;
     double trCg1, trCe1, trCg2, trCe2, trB_gg, trB_ge, trB_ee;
@@ -2019,18 +2020,18 @@ void CalcCRT(const My_matrix<double> & Hessian_inv, const My_matrix<double> & Qi
     }
 
     inverse_matrix(Qi_si);
-
+//    std::cout << "line 2023" << std::endl;
     My_matrix<double> QiM_g1(dc_size, dc_size);
     My_matrix<double> QiM_e1(dc_size, dc_size);
 
-    My_matrix<double> QiMQi_g1_s(dc_size, dc_size);
-    My_matrix<double> QiMQi_e1_s(dc_size, dc_size);
+    My_matrix<double> QiMQi_g1_s(d_size, d_size);
+    My_matrix<double> QiMQi_e1_s(d_size, d_size);
 
     My_matrix<double> QiM_g2(dc_size, dc_size);
     My_matrix<double> QiM_e2(dc_size, dc_size);
 
-    My_matrix<double> QiMQi_g2_s(dc_size, dc_size);
-    My_matrix<double> QiMQi_e2_s(dc_size, dc_size);
+    My_matrix<double> QiMQi_g2_s(d_size, d_size);
+    My_matrix<double> QiMQi_e2_s(d_size, d_size);
 
     My_matrix<double> QiMQiMQi_gg_s(d_size, d_size);
     My_matrix<double> QiMQiMQi_ge_s(d_size, d_size);
@@ -2054,14 +2055,15 @@ void CalcCRT(const My_matrix<double> & Hessian_inv, const My_matrix<double> & Qi
         }
         trmul(QiM_g1, Qi, QiMQi_g1); //QiMQi_g1 is a new matrix here
         trmul(QiM_e1, Qi, QiMQi_e1);
-
-        for( i=0; i<dc_size; ++i ){
-            for( j=0; j<dc_size; ++j ){
+//        std::cout << "line 2058" << std::endl;
+        for( i=0; i<d_size; ++i ){
+            for( j=0; j<d_size; ++j ){
                 QiMQi_g1_s.get_matrix()[i][j]=QiMQi_g1.get_matrix()[(c_size - 1) * d_size+i][(c_size - 1) * d_size+j];
                 QiMQi_e1_s.get_matrix()[i][j]=QiMQi_e1.get_matrix()[(c_size - 1) * d_size+i][(c_size - 1) * d_size+j];
             }
         }
         trmul(QiMQi_g1_s, Qi_si, QiMQisQisi_g1);
+//        std::cout << "line 2066" << std::endl;
         // Calculate trCg1 and trCe1.
         trCg1 = 0.0;
         for ( k = 0; k < d_size; ++k) {
@@ -2072,6 +2074,7 @@ void CalcCRT(const My_matrix<double> & Hessian_inv, const My_matrix<double> & Qi
         for ( k = 0; k < d_size; ++k) {
             trCe1 -= QiMQisQisi_e1.get_matrix()[k][k];//gsl_matrix_get(QiMQisQisi_e1, k, k);
         }
+//        std::cout << "line 2076" << std::endl;
         for (size_t v2 = 0; v2 < v_size; ++v2) {
             if (v2 < v1) {
                 continue;
@@ -2085,8 +2088,8 @@ void CalcCRT(const My_matrix<double> & Hessian_inv, const My_matrix<double> & Qi
             trmul(QiM_g2, Qi, QiMQi_g2);
             trmul(QiM_e2, Qi, QiMQi_e2);
 
-            for( i=0; i<dc_size; ++i ){
-                for( j=0; j<dc_size; ++j ){
+            for( i=0; i<d_size; ++i ){
+                for( j=0; j<d_size; ++j ){
                     QiMQi_g2_s.get_matrix()[i][j]=QiMQi_g2.get_matrix()[(c_size - 1) * d_size+i][(c_size - 1) * d_size+j];
                     QiMQi_e2_s.get_matrix()[i][j]=QiMQi_e2.get_matrix()[(c_size - 1) * d_size+i][(c_size - 1) * d_size+j];
                 }
@@ -2137,8 +2140,9 @@ void CalcCRT(const My_matrix<double> & Hessian_inv, const My_matrix<double> & Qi
                     }
                 }
             }
+//            std::cout << "line 2141" << std::endl;
             trmul(QiM_e1, QiMQi_e2, QiMQiMQi_ee);
-
+            //todo check the fellowing code carefully
             for( i=0; i<d_size; ++i ) {
                 for (j = 0; j < d_size; ++j) {
                     QiMQiMQi_gg_s.get_matrix()[i][j] = QiMQiMQi_gg.get_matrix()[(c_size - 1) * d_size+i][(c_size - 1)
@@ -2255,9 +2259,6 @@ void CalcDev(const char func_name, const Eigen_result & eigen_r, const My_matrix
              My_Vector<double> & gradient,
              My_matrix<double> & Hessian_inv, double &crt_a, double &crt_b,
              double &crt_c) {
-           // because se(Vg):  from the stand output is not correct
-
-//    size_t n_size = ;
 
     size_t d_size = Hi.get_num_row();
     size_t dc_size = Qi.get_num_row();
@@ -2293,15 +2294,25 @@ void CalcDev(const char func_name, const Eigen_result & eigen_r, const My_matrix
     My_matrix<double> xHiDHiDHix_all_ee(dc_size, v_size * v_size * dc_size);
     My_matrix<double> xHiDHiDHix_all_ge(dc_size, v_size * v_size * dc_size);
 
+//    std::cout << "Calc_xHiDHiy_all" << std::endl;
+
     Calc_xHiDHiy_all(eigen_r, xHi, Hiy, n_size, d_size, xHiDHiy_all_g, xHiDHiy_all_e);
 
-    int i, j;
+//    int i, j;
 //    for( i=0; i<dc_size; ++i ){
 //        for( j=0; j<v_size; ++j ){
 //            std::cout << "i " << i << " j " << j << " xHiDHiy_all_g " << xHiDHiy_all_g.get_matrix()[i][j] << std::endl;
 //            std::cout << "i " << i << " j " << j << " xHiDHiy_all_e " << xHiDHiy_all_e.get_matrix()[i][j] << std::endl;
 //        }
 //    }
+//    std::cout << "Calc_xHiDHix_all" << std::endl;
+//    std::cout << "eigen_r: " << eigen_r.get_eigen_vectors().get_num_row() << " " << eigen_r.get_eigen_vectors().get_num_column() << std::endl;
+//    std::cout << "xHi: " << xHi.get_num_row() << " " << xHi.get_num_column() << std::endl;
+//    std::cout << "n_size: " << n_size << std::endl;
+//    std::cout << "d_size: " << d_size << std::endl;
+//    std::cout << "dc_size: " << dc_size << std::endl;
+//    std::cout << "xHiDHix_all_g: " << xHiDHix_all_g.get_num_row() << " " << xHiDHix_all_g.get_num_column() << std::endl;
+//    std::cout << "xHiDHix_all_w: " << xHiDHix_all_e.get_num_row() << " " << xHiDHix_all_e.get_num_column() << std::endl;
 
     Calc_xHiDHix_all(eigen_r, xHi, n_size, d_size, dc_size, xHiDHix_all_g, xHiDHix_all_e);
 
@@ -2311,7 +2322,7 @@ void CalcDev(const char func_name, const Eigen_result & eigen_r, const My_matrix
 //            std::cout << "i " << i << " j " << j << " xHiDHix_all_e " << xHiDHix_all_e.get_matrix()[i][j] << std::endl;
 //        }
 //    }
-
+//    std::cout << "Calc_xHiDHixQixHiy_all" << std::endl;
     Calc_xHiDHixQixHiy_all( xHiDHix_all_g, xHiDHix_all_e, QixHiy, dc_size, xHiDHixQixHiy_all_g, xHiDHixQixHiy_all_e);
 
 //    for( i=0; i<dc_size; ++i ){
@@ -2321,7 +2332,7 @@ void CalcDev(const char func_name, const Eigen_result & eigen_r, const My_matrix
 //        }
 //    }
 
-
+//    std::cout << "Calc_xHiDHiDHiy_all" << std::endl;
     Calc_xHiDHiDHiy_all(v_size, eigen_r, Hi, xHi, Hiy, n_size, d_size, xHiDHiDHiy_all_gg, xHiDHiDHiy_all_ee,
                         xHiDHiDHiy_all_ge);
 //
@@ -2332,7 +2343,7 @@ void CalcDev(const char func_name, const Eigen_result & eigen_r, const My_matrix
 //            std::cout << "i " << i << " j " << j << " xHiDHiDHiy_all_ge " << xHiDHiDHiy_all_ge.get_matrix()[i][j] << std::endl;
 //        }
 //    }
-
+//    std::cout << "Calc_xHiDHiDHix_all" << std::endl;
     Calc_xHiDHiDHix_all(v_size, eigen_r, Hi, xHi, n_size, d_size, dc_size, xHiDHiDHix_all_gg, xHiDHiDHix_all_ee,
                         xHiDHiDHix_all_ge);
 
@@ -2343,7 +2354,7 @@ void CalcDev(const char func_name, const Eigen_result & eigen_r, const My_matrix
 //            std::cout << "i " << i << " j " << j << " xHiDHiDHix_all_ge " << xHiDHiDHix_all_ge.get_matrix()[i][j] << std::endl;
 //        }
 //    }
-
+//    std::cout << "Calc_QiVec_all" << std::endl;
     Calc_QiVec_all(Qi, xHiDHiy_all_g, xHiDHiy_all_e, QixHiDHiy_all_g,
                    QixHiDHiy_all_e);
 //
@@ -2353,7 +2364,7 @@ void CalcDev(const char func_name, const Eigen_result & eigen_r, const My_matrix
 //            std::cout << "i " << i << " j " << j << " QixHiDHiy_all_e " << QixHiDHiy_all_e.get_matrix()[i][j] << std::endl;
 //        }
 //    }
-
+//    std::cout << "Calc_QiVec_all" << std::endl;
     Calc_QiVec_all(Qi, xHiDHixQixHiy_all_g, xHiDHixQixHiy_all_e,
                    QixHiDHixQixHiy_all_g, QixHiDHixQixHiy_all_e);
 
@@ -2363,7 +2374,7 @@ void CalcDev(const char func_name, const Eigen_result & eigen_r, const My_matrix
 //            std::cout << "i " << i << " j " << j << " QixHiDHixQixHiy_all_e " << QixHiDHixQixHiy_all_e.get_matrix()[i][j] << std::endl;
 //        }
 //    }
-
+//    std::cout << "Calc_QiMat_all" << std::endl;
     Calc_QiMat_all(Qi, xHiDHix_all_g, xHiDHix_all_e, dc_size, QixHiDHix_all_g,
                    QixHiDHix_all_e);
 //
@@ -2387,7 +2398,7 @@ void CalcDev(const char func_name, const Eigen_result & eigen_r, const My_matrix
                 continue;
             }
             v1 = GetIndex(i1, j1, d_size);
-
+//            std::cout << "Calc_yPDPy" << std::endl;
             Calc_yPDPy(eigen_r, Hiy, QixHiy, xHiDHiy_all_g, xHiDHiy_all_e, xHiDHixQixHiy_all_g, xHiDHixQixHiy_all_e, i1,
                        j1, n_size, d_size, yPDPy_g, yPDPy_e);
 
@@ -2417,7 +2428,7 @@ void CalcDev(const char func_name, const Eigen_result & eigen_r, const My_matrix
                     if (v2 < v1) {
                         continue;
                     }
-
+//                    std::cout << "Calc_yPDPDPy" << std::endl;
                     Calc_yPDPDPy(eigen_r, Hi, xHi, Hiy, QixHiy, xHiDHiy_all_g, xHiDHiy_all_e,
                                  QixHiDHiy_all_g, QixHiDHiy_all_e, xHiDHixQixHiy_all_g,
                                  xHiDHixQixHiy_all_e, QixHiDHixQixHiy_all_g,
@@ -2475,6 +2486,7 @@ void CalcDev(const char func_name, const Eigen_result & eigen_r, const My_matrix
 //    }
 
     // Invert Hessian.
+//    std::cout << "inverse_matrix" << std::endl;
     Hessian_inv.value_copy(Hessian);
     inverse_matrix(Hessian_inv);
 //
@@ -2486,10 +2498,13 @@ void CalcDev(const char func_name, const Eigen_result & eigen_r, const My_matrix
 
     // Calculate Edgeworth correction factors after inverting
     // Hessian.
+//    std::cout << "CalcCRT" << std::endl;
     if (c_size > 1) {
+//        std::cout << "CalcCRT begin" << std::endl;
         CalcCRT( Hessian_inv, Qi, QixHiDHix_all_g, QixHiDHix_all_e,
                  xHiDHiDHix_all_gg, xHiDHiDHix_all_ee, xHiDHiDHix_all_ge,
-                 d_size, c_size, dc_size, crt_a, crt_b, crt_c);
+                 d_size, crt_a, crt_b, crt_c);
+//        std::cout << "CalcCRT end" << std::endl;
     } else {
         crt_a = 0.0;
         crt_b = 0.0;
@@ -2602,8 +2617,9 @@ double MphNR(const char & func_name, const size_t & max_iter, const double & max
 
             // Update Vg, Ve, and invert Hessian.
             if (t != 0) {
+//                std::cout << "update Vg Ve begin" << std::endl;
                 UpdateVgVe(Hessian_inv, gradient, step_scale, V_g, V_e);
-//                std::cout << "updating Vg Ve" << std::endl;
+//                std::cout << "update Vg Ve end" << std::endl;
             }
 //            std::cout << "2485 Check if both Vg and Ve are positive definite." << std::endl;
             // Check if both Vg and Ve are positive definite.
@@ -2627,7 +2643,9 @@ double MphNR(const char & func_name, const size_t & max_iter, const double & max
             // and logl.
             //std::cout << "line 2509. t " << t << std::endl;
             if (flag_pd == 1) {
+//                std::cout << "CalcHiQi" << std::endl;
                 CalcHiQi( eigen_r, X, n_size, d_size, c_size, dc_size, V_g, V_e, Hi_all, Qi, logdet_H, logdet_Q);
+//                std::cout << "Calc_Hiy_all" << std::endl;
                 Calc_Hiy_all(Y, Hi_all, n_size, d_size, Hiy_all);
 /*
                 for( int k=0; k<Hi_all.get_num_row(); ++k ){
@@ -2642,6 +2660,7 @@ double MphNR(const char & func_name, const size_t & max_iter, const double & max
                 }
 */
 // Calculate all xHi.
+//                std::cout << "Calc_xHi_all" << std::endl;
                 Calc_xHi_all( X, Hi_all, n_size, d_size, c_size, xHi_all);
 /*
                 // Calculate QixHiy and yPy.
@@ -2655,8 +2674,9 @@ double MphNR(const char & func_name, const size_t & max_iter, const double & max
                         std::cout << "max_iter: " << max_iter << " t " << t << " k " << k << " l " << l << " Y: " << Y.get_matrix()[k][l] << std::endl;
                     }
                 }
-*/
+*/ //              std::cout << "Calc_xHiy" << std::endl;
                 Calc_xHiy( Y, xHi_all, n_size, d_size, dc_size, xHiy);
+//                std::cout << "trmul(Qi, xHiy, QixHiy)" << std::endl;
                 trmul(Qi, xHiy, QixHiy);
 /*
                 for( int k=0; k<Qi.get_num_row(); ++k ){
@@ -2674,7 +2694,9 @@ double MphNR(const char & func_name, const size_t & max_iter, const double & max
   //                  std::cout << "max_iter: " << max_iter << " t " << t << " line 2588 QixHiy: " << QixHiy.get_array()[j] << " xHiy " << xHiy.get_array()[j] << std::endl;
                 }
  //               std::cout << "max_iter: " << max_iter << " t " << t << " line 2589 yPy: " << yPy << std::endl;
+//                std::cout << "Calc_yHiy" << std::endl;
                 yPy = Calc_yHiy(Y, Hiy_all, n_size, d_size) - yPy;
+//                std::cout << "Calc_yHiy done " << std::endl;
    //             std::cout << "max_iter: " << max_iter << " t " << t << " line 2591 yPy: " << yPy << std::endl;
                 // Calculate log likelihood/restricted likelihood value.
 //                std::cout << "line 2526" << std::endl;
@@ -2685,14 +2707,15 @@ double MphNR(const char & func_name, const size_t & max_iter, const double & max
                 } else {
                     logl_new = logl_const - 0.5 * logdet_H - 0.5 * yPy;
                 }
+//                std::cout << "line 2695" << std::endl;
             }
-//            std::cout << "line 2533" << std::endl;
+//            std::cout << "line 2697" << std::endl;
             step_scale /= 2.0;
             step_iter++;
         } while (
                 (flag_pd == 0 || logl_new < logl_old || logl_new - logl_old > 10) &&
                 step_iter < 10 && t != 0);
-//        std::cout << "line 2644 Terminate if change is small. t " << t << std::endl;
+//        std::cout << "line 2703 Terminate if change is small. t " << t << std::endl;
         // Terminate if change is small.
         if (t != 0) {
             if (logl_new < logl_old || flag_pd == 0) {
@@ -2711,7 +2734,7 @@ double MphNR(const char & func_name, const size_t & max_iter, const double & max
         CalcDev(func_name, eigen_r, Qi, Hi_all, xHi_all, Hiy_all, QixHiy, n_size,/*
                 d_size, c_size, dc_size,*/ gradient,
                 Hessian_inv, crt_a, crt_b, crt_c);
-
+//        std::cout << "line 2722" << std::endl;
 //        for( i=0; i<Hessian_inv.get_num_row(); ++i ){
 //            for( j=0; j<Hessian_inv.get_num_column(); ++j ){
 //                //Hessian_inv.get_matrix()[i][j] = -1 * Hessian_inv.get_matrix()[i][j];
@@ -2923,9 +2946,9 @@ void AnalyzePlink(const Eigen_result & eigen_r, const My_matrix<double> & UtW, c
     size_t ti;
     size_t ii;
     My_matrix<double> X_sub(c_size, n_size);
-    My_matrix<double> B_sub(d_size, c_size);
+//    My_matrix<double> B_sub(d_size, c_size);
     My_matrix<double> xHi_all_sub(d_size * c_size, d_size * n_size);
-
+/*
     for( i=0; i<d_size; ++i ){
         for( j=0; j<c_size; ++j ) {
             B_sub.get_matrix()[i][j]=B.get_matrix()[i][j];
@@ -2935,7 +2958,7 @@ void AnalyzePlink(const Eigen_result & eigen_r, const My_matrix<double> & UtW, c
         for( j=0; j<d_size * n_size; ++j ){
             xHi_all_sub.get_matrix()[i][j] = xHi_all.get_matrix()[i][j];
         }
-    }
+    }*/
     T_matrix(UtY, Y);
     T_matrix(UtW, X_sub);
 /*
@@ -2962,11 +2985,11 @@ void AnalyzePlink(const Eigen_result & eigen_r, const My_matrix<double> & UtW, c
                     xHi_all_sub, Hiy_all, V_g, V_e, Hessian, crt_a, crt_b,
                     crt_c);
 
-    for( i=0; i<d_size * c_size; ++i ){
-        for( j=0; j<d_size * c_size; ++j ){
-            xHi_all.get_matrix()[i][j] = xHi_all_sub.get_matrix()[i][j];
-        }
-    }
+//    for( i=0; i<d_size * c_size; ++i ){
+//        for( j=0; j<d_size * c_size; ++j ){
+//            xHi_all.get_matrix()[i][j] = xHi_all_sub.get_matrix()[i][j];
+//        }
+//    }
     MphCalcBeta(eigen_r, X_sub, n_size, d_size, c_size, Y, V_g, V_e, UltVehiY, B,
                 se_B_null);
     c = 0;
@@ -3151,7 +3174,7 @@ void AnalyzePlink(const Eigen_result & eigen_r, const My_matrix<double> & UtW, c
         }
         if( number_1>= man_l && number_1<=man_u) {
             if(has_missing){
-                std::cout <<  "has missing" << std::endl;
+//                std::cout <<  "has missing" << std::endl;
                 mean=sum/count;
                 for( i_index=0;i_index<indexs.size();++i_index){
                     x.get_array()[indexs[i_index]] = mean;
@@ -3177,11 +3200,7 @@ void AnalyzePlink(const Eigen_result & eigen_r, const My_matrix<double> & UtW, c
                 logl_H1 = MphNR('L', nr_iter / 10, nr_prec * 10, eigen_r, X, Y, n_size, d_size, c_size + 1,
                                 Hi_all, xHi_all, Hiy_all, V_g, V_e, Hessian, crt_a, crt_b, crt_c);
 
-                for (i = 0; i < d_size * c_size; ++i) {
-                    for (j = 0; j < d_size * c_size; ++j) {
-                        xHi_all.get_matrix()[i][j] = xHi_all_sub.get_matrix()[i][j];
-                    }
-                }
+
                 // Calculate beta and Vbeta.
 
                 p_lrt = 1 - chii(2.0 * (logl_H1 - logl_H0), d_size);
@@ -3206,7 +3225,7 @@ void AnalyzePlink(const Eigen_result & eigen_r, const My_matrix<double> & UtW, c
             }
             std::cout << genotype.get_variant_Vector()[t].getChromosome() << " " <<
                       genotype.get_variant_Vector()[t].getPosition() << " " << genotype.get_variant_Vector()[t].getId()
-                      << "  " << p_lrt << " " << logl_H0 << " " << logl_H1 << std::endl;
+                      << "  " << p_lrt << /*" " << logl_H0 << " " << logl_H1 <<*/ std::endl;
         }
     }
 }
@@ -3311,13 +3330,14 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
     const double eps = 0.00001;
     const size_t maxiter=1000;
     const int crt = 0;
-
+    std::cout << "the gemma multiple trait, multiple allic" << std::endl;
     double logl_H0 = 0.0, logl_H1 = 0.0, p_lrt = 0;
     double crt_a, crt_b, crt_c;
 
     size_t c = 0;
     size_t n_size = UtY.get_num_row(), d_size = UtY.get_num_column(), c_size = UtW.get_num_column();
-    size_t dc_size = d_size * (c_size + 1), v_size = d_size * (d_size + 1) / 2;
+    //size_t dc_size = d_size * (c_size + 1);
+    size_t v_size = d_size * (d_size + 1) / 2;
 
     // Large matrices for EM.
     My_matrix<double> U_hat(d_size, n_size);
@@ -3337,7 +3357,7 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
     My_matrix<double> Hiy_all(d_size, n_size);
 
     // Each dcxdc block is x_k\otimes H_k^{-1}.
-    My_matrix<double> xHi_all(dc_size, d_size * n_size);
+    //My_matrix<double> xHi_all(dc_size, d_size * n_size);
     My_matrix<double> Hessian(v_size * 2, v_size * 2);
 
     My_matrix<double> Y(d_size, n_size);
@@ -3360,11 +3380,11 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
 //    My_matrix<double> B_sub(d_size, c_size);
     My_matrix<double> xHi_all_sub(d_size * c_size, d_size * n_size);
 
-     for( i=0; i<d_size * c_size; ++i ){
-        for( j=0; j<d_size * n_size; ++j ){
-            xHi_all_sub.get_matrix()[i][j] = xHi_all.get_matrix()[i][j];
-        }
-    }
+//    for( i=0; i<d_size * c_size; ++i ){
+//        for( j=0; j<d_size * n_size; ++j ){
+//            xHi_all_sub.get_matrix()[i][j] = xHi_all.get_matrix()[i][j];
+//        }
+//    }
     T_matrix(UtY, Y);
     T_matrix(UtW, X_sub);
 
@@ -3383,11 +3403,11 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
                     xHi_all_sub, Hiy_all, V_g, V_e, Hessian, crt_a, crt_b,
                     crt_c);
 
-    for( i=0; i<d_size * c_size; ++i ){
-        for( j=0; j<d_size * c_size; ++j ){
-            xHi_all.get_matrix()[i][j] = xHi_all_sub.get_matrix()[i][j];
-        }
-    }
+//    for( i=0; i<d_size * c_size; ++i ){
+//        for( j=0; j<d_size * c_size; ++j ){
+//            xHi_all.get_matrix()[i][j] = xHi_all_sub.get_matrix()[i][j];
+//        }
+//    }
     MphCalcBeta(eigen_r, X_sub, n_size, d_size, c_size, Y, V_g, V_e, UltVehiY, B_null,
                 se_B_null);
     c = 0;
@@ -3458,11 +3478,6 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
     logl_H0 = MphNR('L', nr_iter, nr_prec, eigen_r, X_sub, Y, n_size, d_size, c_size, Hi_all,
                     xHi_all_sub, Hiy_all, V_g, V_e, Hessian, crt_a, crt_b,
                     crt_c);
-    for( i=0; i<d_size * c_size; ++i ){
-        for( j=0; j<d_size * c_size; ++j ){
-            xHi_all.get_matrix()[i][j] = xHi_all_sub.get_matrix()[i][j];
-        }
-    }
 
     MphCalcBeta(eigen_r, X_sub, n_size, d_size, c_size, Y, V_g, V_e, UltVehiY, B_null,
                 se_B_null);
@@ -3539,7 +3554,7 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
     // Start reading genotypes and analyze.
     // Calculate n_bit and c, the number of bit for each snp.
 
-    int size, p, q;
+    int size, q;
     int j_1;
     double this_this_state;
     for (size_t t = 0; t < genotype.get_number_of_variant(); ++t) {
@@ -3561,13 +3576,13 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
                     allThisStates_vector.push_back(ittt->first);
                 }
             }
-            if (allThisStates_vector.size() > 0) {
+            if (allThisStates_vector.size() > 1) {
+
                 size = allThisStates_vector.size();
                 q = c_size + size - 1; // here minute 1 is because we do not take all the allele as covariants
-                p = n_size - q;
-
+//                std::cout << "line 3565 size:" << size << std::endl;
                 My_matrix<double> x(n_size, size-1);
-                My_matrix<double> X_row(n_size, q );
+                My_matrix<double> X_row(n_size, size-1 );
                 My_matrix<double> X(q, n_size);
                 My_matrix<double> B(d_size, q);
 
@@ -3585,7 +3600,7 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
                 // Initial values.
                 V_g.value_copy(V_g_null);
                 V_e.value_copy(V_e_null);
-
+//                std::cout << "line 3589 size:" << size << std::endl;
                 for( int s1=0; s1<c_size; ++s1 ){
                     for( int s2=0; s2<n_size; ++s2 ){
                         X.get_matrix()[s1][s2] = UtW.get_matrix()[s2][s1];
@@ -3600,17 +3615,21 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
                 logl_H1 = MphEM('L', em_iter / 10, em_prec * 10, eigen_r, X, Y, n_size, d_size, q,
                                 U_hat, E_hat, OmegaU, OmegaE, UltVehiY, UltVehiBX, UltVehiU,
                                 UltVehiE, V_g, V_e, B);
-
+//                std::cout << "line 3604 size:" << size << std::endl;
                 p_lrt = 1 - chii(2.0 * (logl_H1 - logl_H0), d_size*(size-1));//todo rethink about this part
                 if (p_lrt < p_nr) {
-                    logl_H1 = MphNR('L', nr_iter / 10, nr_prec * 10, eigen_r, X, Y, n_size, d_size, c_size + 1,
-                                    Hi_all, xHi_all, Hiy_all, V_g, V_e, Hessian, crt_a, crt_b, crt_c);
-
+                    My_matrix<double> xHi_all(d_size*q, d_size * n_size);
                     for (i = 0; i < d_size * c_size; ++i) {
                         for (j = 0; j < d_size * c_size; ++j) {
                             xHi_all.get_matrix()[i][j] = xHi_all_sub.get_matrix()[i][j];
                         }
                     }
+
+//                    std::cout << "line 3607 size:" << size << std::endl;
+                    logl_H1 = MphNR('L', nr_iter / 10, nr_prec * 10, eigen_r, X, Y, n_size, d_size, q,
+                                    Hi_all, xHi_all, Hiy_all, V_g, V_e, Hessian, crt_a, crt_b, crt_c);
+//                    std::cout << "line 3610 size:" << size << std::endl;
+
                     // Calculate beta and Vbeta.
 
                     p_lrt = 1 - chii(2.0 * (logl_H1 - logl_H0), d_size*(size-1)); //todo rethink about this part
@@ -3619,24 +3638,25 @@ void AnalyzePlink_MultiAllic(const Eigen_result & eigen_r, const My_matrix<doubl
                         p_lrt = PCRT(d_size*(size-1), p_lrt, crt_a, crt_b, crt_c);
                     }
                 }
-
-                // Store summary data.
-                for (i = 0; i < d_size; ++i) {
-                    v_beta[i] = beta.get_array()[i];
-                }
-
-                c = 0;
-                for (i = 0; i < d_size; ++i) {
-                    for (j = i; j < d_size; ++j) {
-                        v_Vg[c] = V_g.get_matrix()[i][j];
-                        v_Ve[c] = V_e.get_matrix()[i][j];
-                        v_Vbeta[c] = Vbeta.get_matrix()[i][j];
-                        c++;
+                if( logl_H1 > logl_H0 ){ // if logl_H1 <= logl_H0 there maybe something wrong
+                    // Store summary data.
+                    for (i = 0; i < d_size; ++i) {
+                        v_beta[i] = beta.get_array()[i];
                     }
+
+                    c = 0;
+                    for (i = 0; i < d_size; ++i) {
+                        for (j = i; j < d_size; ++j) {
+                            v_Vg[c] = V_g.get_matrix()[i][j];
+                            v_Ve[c] = V_e.get_matrix()[i][j];
+                            v_Vbeta[c] = Vbeta.get_matrix()[i][j];
+                            c++;
+                        }
+                    }
+                    std::cout << genotype.get_variant_Vector()[t].getChromosome() << " " <<
+                              genotype.get_variant_Vector()[t].getPosition() << " " << genotype.get_variant_Vector()[t].getId()
+                              << "  " << p_lrt /*<< " " << logl_H0 << " " << logl_H1 */<< std::endl;
                 }
-                std::cout << genotype.get_variant_Vector()[t].getChromosome() << " " <<
-                          genotype.get_variant_Vector()[t].getPosition() << " " << genotype.get_variant_Vector()[t].getId()
-                          << "  " << p_lrt << " " << logl_H0 << " " << logl_H1 << std::endl;
             }
         }
     }

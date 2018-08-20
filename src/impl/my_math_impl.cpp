@@ -282,10 +282,10 @@ double gam2(const double & a, const double & x){
             q1=q;
         }
     }
-    printf("a too large !\n");
+    //printf("a too large !\n");
     s=1.0-s*exp(-x)*qq/gam1(a);
     return(s);
-  }
+}
 
 double chii(double x,const int &n){
     double y;

@@ -56,7 +56,7 @@ double determinant( const My_matrix<double> & _x ){
 
 // inverse matrix
 void inverse_matrix(My_matrix<double>& c){
-    assert( c.get_num_column() == c.get_num_row());
+//    assert( c.get_num_column() == c.get_num_row());
     int *is, *js, i, j, k, n=c.get_num_column();
     double d, p;
     is = new int[n];
@@ -73,11 +73,12 @@ void inverse_matrix(My_matrix<double>& c){
                 }
             }
         }
-        if( d == 0.0 ){
+        if( d == 0.0 && k != (n-1) ){
             delete [] is;
             delete [] js;
-            std::cout << ("everything is zero, error, matrix it not invertible") << std::endl;
-            exit(1);
+            std::cerr << ("everything is zero, error, matrix is not invertible") << std::endl;
+            return;
+            //exit(1);
         }
         if( is[k] != k ){
             for( j=0; j<n; ++j ){
